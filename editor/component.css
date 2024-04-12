@@ -1,0 +1,57 @@
+.editor {
+    border: 2px solid #d0d0d0;
+    width: 100%;
+}
+
+.func {
+    border-bottom: 2px solid #d0d0d0;
+    padding: 1rem 1rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap:1rem
+}
+
+.input {
+    height: 20rem;
+}
+
+.formatBtn {
+    /* border: 2px solid #d0d0d0; */
+    width: 1rem;
+    height: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.formatBtnActivate {
+    /* border: 2px solid #d0d0d0; */
+    color: #2673f0;
+    width: 1rem;
+    height: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.formatBtnDisabled {
+    color: #d0d0d0;
+    width: 1rem;
+    height: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.selectBox {
+    padding: 0.5rem;
+}
+
+.radioBtn {
+    font-size: 0.8rem;
+}
+
+.radioOption{
+    cursor: pointer;
+}
