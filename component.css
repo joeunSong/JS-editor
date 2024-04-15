@@ -3,3 +3,25 @@
     background-color: cornsilk;
     height: 20rem;
 }
+
+.horizonAlign {
+    display: flex;
+    flex-direction: row;
+    gap: 2.5rem;
+    justify-content: center;
+}
+
+#my-object {
+        width : 100%;
+        height: 70%;
+    }
+
+.container {
+    width: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    text-align: center;
+    margin-top: 2rem;
+    height: 100%;
+}
