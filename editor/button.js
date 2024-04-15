@@ -1,9 +1,22 @@
+// 서식 버튼 모듈화
 function FormatButton (parent, id, icon) {
-    let parentDiv = document.querySelector(`#${parent}`);
+    console.log(`Command: ${id}, Icon: ${icon}`);
+    let parentDiv = document.querySelector(`.${parent}`);
+    console.log(parentDiv)
     let newBtn = document.createElement("button");
-    newBtn.appendChild(icon)
-    newBtn.className("formatBtn")
-    console.log(`Command: ${command}, Icon: ${icon}`);
+    let newI = document.createElement('i');
+    newI.className = icon;
+    newBtn.appendChild(newI);
+    newBtn.className = "formatBtn";
+    if(id.includes('btn')){
+        // 목록, 이미지 버튼
+        // console.log(id + ' FormatButton Click - btn');
+    } else if(!id.includes('btn')) {
+        newBtn.addEventListener('click', function () {
+            document.execCommand(id);
+            document.queryCommandState(id) ? newBtn.style.color = '#2673f0' : newBtn.style.color = 'black';
+        });
+    }
     parentDiv.appendChild(newBtn)
 }
 
