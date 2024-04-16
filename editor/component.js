@@ -8,7 +8,7 @@ function FormatButton (parent, id, icon) {
     newBtn.id = id;
     newBtn.className = "formatBtn";
     if(id.includes('btn')){
-        // 목록, 이미지 버튼
+        // 목록, 이미지 버튼 기능 추가
         // console.log(id + ' FormatButton Click - btn');
     } else if(!id.includes('btn')) {
         newBtn.addEventListener('click', function () {

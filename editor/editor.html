@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- <link rel="stylesheet" href="../global.css" /> -->
-    <!-- <link rel="stylesheet" href="../global.css" /> -->
     <link rel="stylesheet" href="component.css" />
     <script src="https://kit.fontawesome.com/cec5d0ed2c.js" crossorigin="anonymous"></script>
 </head>
@@ -23,6 +22,7 @@
                 FormatButton("func", "justifyCenter", 'fa-solid fa-align-center')
                 FormatButton("func", "justifyRight", 'fa-solid fa-align-right')
                 FormatButton("func", "btn-image", 'fa-regular fa-image')
+
             </script>
             <select name="heading" class="selectBox">
                 <option value="heading1">Heading 1</option>
@@ -34,21 +34,36 @@
             </select>
             <label class="radioBtn">
                 <label class="radioOption">
-                    <input type="radio" name="mode" value="edit" checked />
+                    <input type="radio" name="mode" value="edit" onClick='ChangeMode(this)' checked />
                     <span>편집모드</span>
                 </label>
                 <label class="radioOption">
-                    <input type="radio" name="mode" value="html" />
+                    <input type="radio" name="mode" value="html" onClick='ChangeMode(this)' />
                     <span>HTML모드</span>
                 </label>
                 <label class="radioOption">
-                    <input type="radio" name="mode" value="preview" />
+                    <input type="radio" name="mode" value="preview" onClick='ChangeMode(this)' />
                     <span>미리보기</span>
                 </label>
             </label>
         </div>
-        <div class="input">
-            editor
+        <div 
+        class="inputEdit"
+        id="editMode"
+        contenteditable='true' 
+        placeholder="여기에 내용을 입력하세요." 
+        onclick='CheckFormat()'
+        style="display:block"
+
+        >
+        </div>
+        <div class="inputEdit" 
+            id="htmlMode" 
+            contenteditable='true' 
+            style="display:none"
+        >
+        </div>
+        <div class="inputEdit" id="preViewMode" style="display:none">
         </div>
         <hr>
     </div>
