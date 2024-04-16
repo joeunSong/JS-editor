@@ -8,7 +8,7 @@
     <script src="https://kit.fontawesome.com/cec5d0ed2c.js" crossorigin="anonymous"></script>
 </head>
 <body style="text-align: center;">
-    <script src="./button.js"></script>
+    <script src="./component.js"></script>
     <div class="editor">
         <div class="func">
             <script type="text/javascript">
@@ -51,7 +51,8 @@
         id="editMode"
         contenteditable='true' 
         placeholder="여기에 내용을 입력하세요." 
-        style="display:black"
+        onclick='CheckFormat()'
+        style="display:block"
         >
         </div>
         <div class="inputEdit" id="htmlMode" contenteditable='true' style="display:none">
@@ -61,5 +62,6 @@
         <hr>
     </div>
     <div style="color: #d0d0d0; ">↓ 높이 조절 가능 ↓</div>
+    <script src="./button.js"></script>
 </body>
 </html>

@@ -1,23 +1,64 @@
-// 서식 버튼 모듈화
-function FormatButton (parent, id, icon) {
-    console.log(`Command: ${id}, Icon: ${icon}`);
-    let parentDiv = document.querySelector(`.${parent}`);
-    console.log(parentDiv)
-    let newBtn = document.createElement("button");
-    let newI = document.createElement('i');
-    newI.className = icon;
-    newBtn.appendChild(newI);
-    newBtn.className = "formatBtn";
-    if(id.includes('btn')){
-        // 목록, 이미지 버튼
-        // console.log(id + ' FormatButton Click - btn');
-    } else if(!id.includes('btn')) {
-        newBtn.addEventListener('click', function () {
-            document.execCommand(id);
-            document.queryCommandState(id) ? newBtn.style.color = '#2673f0' : newBtn.style.color = 'black';
-        });
+// 서식 버튼 동기화 함수
+function CheckFormat() {
+    const selection = document.getSelection();
+
+    const btnBold = document.querySelector("#bold");
+    const btnItalic = document.querySelector("#italic");
+    const btnStrikethrough = document.querySelector("#strikeThrough");
+    const btnUnderline = document.querySelector("#underLine");
+    // todo. 목록 버튼 동기화
+    const btnLeft = document.querySelector("#justifyLeft");
+    const btnCenter = document.querySelector("#justifyCenter");
+    const btnRight = document.querySelector("#justifyRight");
+    console.log("focus")
+
+    if (selection.rangeCount > 0) {
+        let range = selection.getRangeAt(0);
+        let parentElement = range.startContainer.parentElement;
+
+        while(parentElement.localName!=='div') {
+            btnBold.style.color='black';
+            console.log(range)
+            if (parentElement.localName === "b") {
+                btnBold.style.color = '#2673f0';
+            } else {
+                btnBold.style.color = 'black';
+            }
+            parentElement.localName==="b" ? btnBold.style.color = '#2673f0' : btnBold.style.color = 'black';
+            parentElement.localName==="i" ? btnItalic.style.color = '#2673f0' : btnItalic.style.color = 'black';
+            parentElement.localName==="strike" ? btnStrikethrough.style.color = '#2673f0' : btnStrikethrough.style.color = 'black';
+            parentElement.localName==="u" ? btnUnderline.style.color = '#2673f0' : btnUnderline.style.color = 'black';
+            // parentElement.localName==="justifyLeft" ? btnLeft.style.color = '#2673f0' : btnLeft.style.color = 'black';
+            // parentElement.localName==="justifyCenter" ? btnCenter.style.color = '#2673f0' : btnCenter.style.color = 'black';
+            // parentElement.localName==="justifyRight" ? btnRight.style.color = '#2673f0' : btnRight.style.color = 'black';
+
+            if(parentElement.localName==='div') break;
+
+            parentElement = parentElement.parentElement;
+        }
+
+        // console.log("parentElement.localName: "+parentElement.localName)
+        // console.log("parentElement.parentElement.localName: "+parentElement.parentElement.localName)
+        // console.log(parentElement.localName==='div')
+
+        // console.log(range)
+        // console.log(range.startContainer.parentNode)
+        // console.log(range.startContainer.parentElement.localName)
+
+        // console.log(range.startContainer.parentElement.parentElement.parentElement)
+        // console.log(range.startContainer.parentElement.parentElement)
+        // console.log(range.startContainer.parentElement)
+        // 찍힌 range 기준으로 서식 버튼 동기화
+        // range.startContainer.parentElement가 div가 될 때 까지 나오는 서식의 버튼 활성화
     }
-    parentDiv.appendChild(newBtn)
+
+    // document.queryCommandState("bold") ? btnBold.style.color = '#2673f0' : btnBold.style.color = 'black';
+    // document.queryCommandState("italic") ? btnItalic.style.color = '#2673f0' : btnItalic.style.color = 'black';
+    // document.queryCommandState("underline") ? btnUnderline.style.color = '#2673f0' : btnUnderline.style.color = 'black';
+    // document.queryCommandState("strikeThrough") ? btnStrikethrough.style.color = '#2673f0' : btnStrikethrough.style.color = 'black';
+    // document.queryCommandState("justifyLeft") ? btnLeft.style.color = '#2673f0' : btnLeft.style.color = 'black';
+    // document.queryCommandState("justifyCenter") ? btnCenter.style.color = '#2673f0' : btnCenter.style.color = 'black';
+    // document.queryCommandState("justifyRight") ? btnRight.style.color = '#2673f0' : btnRight.style.color = 'black';
 }
 
 
