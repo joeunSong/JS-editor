@@ -1,3 +1,7 @@
+body {
+    text-align: center;
+}
+
 .editor {
     border: 2px solid #d0d0d0;
     width: 100%;

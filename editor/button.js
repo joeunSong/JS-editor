@@ -1,21 +1,26 @@
 // 서식 버튼 동기화 함수
-function CheckFormat() {
+export function CheckFormat(id) {
     const editMode = document.querySelector("#editMode");
         const selection = document.getSelection();
 
-        const btnBold = document.querySelector("#bold");
-        const btnItalic = document.querySelector("#italic");
-        const btnStrikethrough = document.querySelector("#strikeThrough");
-        const btnUnderline = document.querySelector("#underline");
+        const btnBold = document.querySelector(`#${id}_formatBtn_bold`);
+        const btnItalic = document.querySelector(`#${id}_formatBtn_italic`);
+        const btnStrikethrough = document.querySelector(`#${id}_formatBtn_strikeThrough`);
+        const btnUnderline = document.querySelector(`#${id}_formatBtn_underline`);
         // todo. 목록 버튼 동기화
-        const btnLeft = document.querySelector("#justifyLeft");
-        const btnCenter = document.querySelector("#justifyCenter");
-        const btnRight = document.querySelector("#justifyRight");
+        const btnLeft = document.querySelector(`#${id}_formatBtn_justifyLeft`);
+        const btnCenter = document.querySelector(`#${id}_formatBtn_justifyCenter`);
+        const btnRight = document.querySelector(`#${id}_formatBtn_justifyRight`);
+
+        console.log(btnBold)
         
         document.queryCommandState("bold") ? btnBold.style.color = '#2673f0' : btnBold.style.color = 'black'
         document.queryCommandState("italic") ? btnItalic.style.color = '#2673f0' : btnItalic.style.color = 'black'
         document.queryCommandState("strikeThrough") ? btnStrikethrough.style.color = '#2673f0' : btnStrikethrough.style.color = 'black'
         document.queryCommandState("underline") ? btnUnderline.style.color = '#2673f0' : btnUnderline.style.color = 'black'
+        document.queryCommandState("justifyLeft") ? btnLeft.style.color = '#2673f0' : btnLeft.style.color = 'black'
+        document.queryCommandState("justifyCenter") ? btnCenter.style.color = '#2673f0' : btnCenter.style.color = 'black'
+        document.queryCommandState("justifyRight") ? btnRight.style.color = '#2673f0' : btnRight.style.color = 'black'
 
     // if (selection.rangeCount > 0) {
     //     let range = selection.getRangeAt(0);
@@ -46,7 +51,7 @@ function CheckFormat() {
 
 
 // 모드 변환 함수
-function ChangeMode (obj) {
+export function ChangeMode (obj) {
     const editMode = document.querySelector("#editMode");
     const htmlMode = document.querySelector("#htmlMode");
     const preViewMode = document.querySelector("#preViewMode");

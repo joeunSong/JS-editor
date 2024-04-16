@@ -1,21 +1,51 @@
-// 서식 버튼 모듈화
-function FormatButton (parent, id, icon) {
-    let parentDiv = document.querySelector(`.${parent}`);
-    let newBtn = document.createElement("button");
-    let newI = document.createElement('i');
-    newI.className = icon;
-    newBtn.appendChild(newI);
-    newBtn.id = id;
-    newBtn.className = "formatBtn";
-    if(id.includes('btn')){
-        // 목록, 이미지 버튼 기능 추가
-        // console.log(id + ' FormatButton Click - btn');
-    } else if(!id.includes('btn')) {
-        newBtn.addEventListener('click', function () {
-            document.execCommand(id);
-            document.queryCommandState(id) ? newBtn.style.color = '#2673f0' : newBtn.style.color = 'black';
-        });
+import { buttonIcon } from "./data.js";
+
+/**
+ * 서식 버튼 UI
+ * @param {string} id editor id
+ * @param {string} btnId 버튼 고유 id
+ * @param {string} format 버튼의 서식 역할
+ */
+export function CreateFormatBtn(id, btnId, format) {
+  const newI = document.createElement("i");
+  newI.className = buttonIcon[format];
+
+  const newBtn = document.createElement("button");
+  newBtn.id = `${id}${btnId}`;
+  newBtn.className = "formatBtn";
+
+  const isFormat = [
+    "bold",
+    "italic",
+    "strikeThrough",
+    "underline",
+    "justifyLeft",
+    "justifyCenter",
+    "justifyRight",
+  ].find((f) => {
+    if (f === format) {
+      return true;
     }
-    // console.log(newBtn.style)
-    parentDiv.appendChild(newBtn)
+  });
+
+  if (isFormat) {
+    newBtn.addEventListener("click", () => {
+      console.log("addEventListener: ");
+      // document.execCommand(format);
+      // document.queryCommandState(format)
+      //   ? (btn.style.color = "#2673f0")
+      //   : (btn.style.color = "black");
+    });
+  }
+  newBtn.appendChild(newI);
+  return newBtn;
+}
+
+// b, i, strike, u 서식 기능
+function execFunction(format, btn) {
+  console.log("btn");
+  document.execCommand(format);
+  document.queryCommandState(format)
+    ? (btn.style.color = "#2673f0")
+    : (btn.style.color = "black");
 }
