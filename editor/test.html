@@ -8,12 +8,16 @@
       src="https://kit.fontawesome.com/cec5d0ed2c.js"
       crossorigin="anonymous"
     ></script>
-      <script type="module" src="./show.js"></script>
+      <script type="text/javascript" src="./editor.js"></script>
       <title>test</title>
   </head>
   <body>
-    <div>
-      <script>show()</script>
-    </div>
+    <script type="text/javascript" >
+      const editor1 = new Editor("editor1");
+      editor1.createEditor();
+
+      const editor2 = new Editor("editor2");
+      editor2.createEditor();
+    </script>
   </body>
 </html>
