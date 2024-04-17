@@ -30,11 +30,7 @@ export function CreateFormatBtn(id, btnId, format) {
 
   if (isFormat) {
     newBtn.addEventListener("click", () => {
-      console.log("addEventListener: ");
-      // document.execCommand(format);
-      // document.queryCommandState(format)
-      //   ? (btn.style.color = "#2673f0")
-      //   : (btn.style.color = "black");
+      execFunction(format, newBtn)
     });
   }
   newBtn.appendChild(newI);
