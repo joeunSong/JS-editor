@@ -34,7 +34,6 @@ const formatBtn = [
  * @param {string} id editor 이름
  */
 Editor.prototype.createEditor = function () {
-  console.log("prototype: ",this.id)
   const app = document.createElement("div");
   const editorApp = document.createElement("div");
   const func = document.createElement("div");
@@ -94,43 +93,28 @@ function CreateToolbar (id, editorApp, func) {
 
   func.appendChild(headingSelect);
 
-  // toolbar mode btn
-  const radioBtn = document.createElement("label");
-  radioBtn.id = `${id}_radioBtn`;
-  radioBtn.className = "radioBtn";
-
-  const radioOption = document.createElement("label");
-  radioOption.id = `${id}_radioOption`;
-  radioOption.className = "radioOption";
-
-  const modeRadioData = [
+  const modeButtonData = [
     { value: "edit", checked: true, text: "편집모드" },
     { value: "html", checked: false, text: "HTML모드" },
     { value: "preview", checked: false, text: "미리보기" },
   ];
 
-  modeRadioData.forEach((data) => {
-    const radioInput = document.createElement("input");
-    radioInput.type = "radio";
-    radioInput.name = "mode";
-    radioInput.value = data.value;
-    radioInput.checked = data.checked;
-    radioInput.addEventListener("click", () => ChangeMode(this));
+  modeButtonData.forEach((data) => {
+    const modeBtn = document.createElement("input");
+    modeBtn.type = 'button';
+    modeBtn.id = `${id}_mode_${data.value}`;
+    modeBtn.className = "modeBtn";
+    modeBtn.value = data.text;
+    modeBtn.addEventListener("click", () => ChangeMode(id, data));
 
-    const radioSpan = document.createElement("span");
-    radioSpan.innerText = data.text;
 
-    radioOption.appendChild(radioInput);
-    radioOption.appendChild(radioSpan);
+  func.appendChild(modeBtn); 
   });
 
-  radioBtn.appendChild(radioOption);
-  func.appendChild(radioBtn);
 }
 
 // edit input
 function CreateEditInput (id, editorApp) {
-  console.log('CreateEditInput: ', id)
   const modeDivData = [
     { id: "editMode", display: "block" },
     { id: "htmlMode", display: "none" },
@@ -147,6 +131,11 @@ function CreateEditInput (id, editorApp) {
     editorApp.appendChild(mode);
 
     // if (data.id === 'editMode') {
+    //   const pTag = document.createElement("p");
+    //   mode.innerText = pTag;
+
+    //   const brTag = document.createElement("br");
+    //   mode.innerText += brTag;
     // }
   });
 }
@@ -218,7 +207,6 @@ function CreateFormatBtn(id, btnId, format) {
 
 // b, i, strike, u 서식 기능
 function execFunction(format, btn) {
-  console.log("btn");
   document.execCommand(format);
   document.queryCommandState(format)
     ? (btn.style.color = "#2673f0")
@@ -227,7 +215,6 @@ function execFunction(format, btn) {
 
 // 서식 버튼 동기화 함수
 function CheckFormat(id) {
-  console.log(id)
   // const selection = document.getSelection();
 
   const btnBold = document.querySelector(`#${id}_formatBtn_bold`);
@@ -289,27 +276,32 @@ function CheckFormat(id) {
 }
 
 // 모드 변환 함수
-function ChangeMode(obj) {
-  const editMode = document.querySelector("#editMode");
-  const htmlMode = document.querySelector("#htmlMode");
-  const preViewMode = document.querySelector("#preViewMode");
+function ChangeMode(id, btn) {
+  console.log(id)
+  const editMode = document.querySelector(`#${id}_editMode`);
+  const htmlMode = document.querySelector(`#${id}_htmlMode`);
+  const preViewMode = document.querySelector(`#${id}_preViewMode`);
 
-  console.log(obj.value);
-  console.log(editMode.style.display);
-  switch (obj.value) {
+  switch (btn.value) {
     case "edit":
+  console.log(btn.value)
+
       editMode.style.display = "block";
       htmlMode.style.display = "none";
       preViewMode.style.display = "none";
       break;
     case "html":
-      htmlMode.innerHTML = editMode.innerHTML;
+  console.log(btn.value)
+
+      htmlMode.innerText = editMode.innerHTML;
       editMode.style.display = "none";
       htmlMode.style.display = "block";
       preViewMode.style.display = "none";
       console.log(editMode.innerHTML);
       break;
     case "preview":
+  console.log(btn.value)
+
       editMode.style.display = "none";
       htmlMode.style.display = "none";
       preViewMode.style.display = "block";
