@@ -130,13 +130,11 @@ function CreateEditInput (id, editorApp) {
     mode.style.display = data.display;
     editorApp.appendChild(mode);
 
-    // if (data.id === 'editMode') {
-    //   const pTag = document.createElement("p");
-    //   mode.innerText = pTag;
+    defaultText = "<p></br></p>"
 
-    //   const brTag = document.createElement("br");
-    //   mode.innerText += brTag;
-    // }
+    if (data.id === 'editMode') {
+      mode.innerHTML = defaultText;
+    }
   });
 }
 
