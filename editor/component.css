@@ -64,6 +64,8 @@ body {
     font-size: 0.8rem;
 }
 
-/* .radioOption{
-    cursor: pointer;
-} */
+.editHeightControl {
+    border-top: 2px solid #d0d0d0;
+    height: 1rem;
+    cursor: pointer; 
+}
