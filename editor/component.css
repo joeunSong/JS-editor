@@ -6,6 +6,10 @@ p {
     margin:0;
 }
 
+textarea {
+    padding: 0;
+}
+
 .editor {
     border: none;
     width: 100%;

@@ -125,7 +125,7 @@ function CreateEditInput(id, editorApp) {
       mode.addEventListener("keydown", () => CheckFormat(id));
       mode.contentEditable = "true";
     } else if (data.id === "htmlMode") {
-      mode = document.createElement("div");
+      mode = document.createElement("textarea");
       // textareaMode = document.createElement("textarea");
       // mode.appendChild(textareaMode)
       // mode.contentEditable = "true";
@@ -312,7 +312,6 @@ function ChangeMode(id, btn) {
   const modeArray = [ editMode, htmlMode, preViewMode ]
   
   let beforeMode = null || editMode;
-  let nowMode = null || editMode;
   
   // const 클릭 전 모드 확인 후, 높이 저장
   modeArray.forEach((mode) => {
@@ -322,28 +321,25 @@ function ChangeMode(id, btn) {
     }
   })
   const beforeModeHeight = window.getComputedStyle(beforeMode).getPropertyValue("height");
+  const beforeModeWidth = window.getComputedStyle(beforeMode).getPropertyValue("width");
   
 
   switch (btn.value) {
     case "edit":
-      console.log(btn.value);
-
       editMode.style.display = "block";
       htmlMode.style.display = "none";
       preViewMode.style.display = "none";
       editMode.style.height = beforeModeHeight;
       break;
     case "html":
-
       htmlMode.innerText = editMode.innerHTML;
       editMode.style.display = "none";
       htmlMode.style.display = "block";
       preViewMode.style.display = "none";
       htmlMode.style.height = beforeModeHeight;
+      htmlMode.style.width = beforeModeWidth;
       break;
     case "preview":
-      console.log(btn.value);
-
       editMode.style.display = "none";
       htmlMode.style.display = "none";
       preViewMode.style.display = "block";
