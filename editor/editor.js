@@ -41,7 +41,6 @@ Editor.prototype.createEditor = function () {
   CreateOutline(this.id, app, editorApp);
   CreateToolbar(this.id, editorApp, func);
   CreateEditInput(this.id, editorApp);
-  CreateEditBottom(this.id, editorApp, app);
 
   return app;
 };
@@ -144,20 +143,6 @@ function CreateEditInput(id, editorApp) {
       mode.innerHTML = defaultText;
     }
   });
-}
-
-// edit bottom
-function CreateEditBottom(id, editorApp, app) {
-  const editHeightControl = document.createElement("div");
-  editHeightControl.className = "editHeightControl";
-  editHeightControl.id = `${id}`;
-  editorApp.appendChild(editHeightControl);
-
-  const heightTextDiv = document.createElement("div");
-  heightTextDiv.style.textAlign = "center";
-  heightTextDiv.style.color = "#d0d0d0";
-  heightTextDiv.innerText = "↓ 높이 조절 가능 ↓";
-  app.appendChild(heightTextDiv);
 }
 
 /**
@@ -317,12 +302,27 @@ function CheckFormat(id) {
   // }
 }
 
-// 모드 변환 함수
+// 모드 변환 + 조절된 높이 모드에 넘겨주는 함수
 function ChangeMode(id, btn) {
   console.log(id);
+  console.log("btn: ",btn);
   const editMode = document.querySelector(`#${id}_editMode`);
   const htmlMode = document.querySelector(`#${id}_htmlMode`);
   const preViewMode = document.querySelector(`#${id}_preViewMode`);
+  const modeArray = [ editMode, htmlMode, preViewMode ]
+  
+  let beforeMode = null || editMode;
+  let nowMode = null || editMode;
+  
+  // const 클릭 전 모드 확인 후, 높이 저장
+  modeArray.forEach((mode) => {
+    const displayElement = window.getComputedStyle(mode).getPropertyValue("display");
+    if (displayElement === "block") {
+      beforeMode = mode;
+    }
+  })
+  const beforeModeHeight = window.getComputedStyle(beforeMode).getPropertyValue("height");
+  
 
   switch (btn.value) {
     case "edit":
@@ -331,15 +331,15 @@ function ChangeMode(id, btn) {
       editMode.style.display = "block";
       htmlMode.style.display = "none";
       preViewMode.style.display = "none";
+      editMode.style.height = beforeModeHeight;
       break;
     case "html":
-      console.log(btn.value);
 
       htmlMode.innerText = editMode.innerHTML;
       editMode.style.display = "none";
       htmlMode.style.display = "block";
       preViewMode.style.display = "none";
-      console.log(editMode.innerHTML);
+      htmlMode.style.height = beforeModeHeight;
       break;
     case "preview":
       console.log(btn.value);
@@ -347,11 +347,12 @@ function ChangeMode(id, btn) {
       editMode.style.display = "none";
       htmlMode.style.display = "none";
       preViewMode.style.display = "block";
+      preViewMode.style.height = beforeModeHeight;
       break;
   }
 }
 
-// 높이 조절 함수
-// function ChangeHeight () {
-//   const resizer = document.getElementById('')
-// }
+// 조절된 높이 모드에 넘겨주는 함수
+function ChangeHeight () {
+  const resizer = document.getElementById('')
+}

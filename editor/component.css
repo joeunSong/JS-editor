@@ -7,22 +7,26 @@ p {
 }
 
 .editor {
-    border: 2px solid #d0d0d0;
+    border: none;
     width: 100%;
     text-align: left;
 }
 
 .func {
-    border-bottom: 2px solid #d0d0d0;
+    border: 2px solid #d0d0d0;
+    border-bottom: none;
     padding: 1rem 1rem;
     display: flex;
-    flex-direction: row;
+    flex-direction: vertical;
     align-items: center;
     gap:1rem
 }
 
 .inputEdit {
+    border: 2px solid #d0d0d0;
     height: 20rem;
+    resize: vertical;
+    overflow:auto;
 }
 
 .formatBtn {
