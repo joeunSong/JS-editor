@@ -42,13 +42,15 @@ Editor.prototype.createEditor = function () {
   CreateToolbar(this.id, editorApp, func);
   CreateEditInput(this.id, editorApp);
   CreateEditBottom(this.id, editorApp, app);
+
+  return app;
 };
 
 // editor outline
 function CreateOutline(id, app, editorApp) {
   // 부모 객체 찾아서 넣기
   app.id = id;
-  document.body.appendChild(app);
+  // document.body.appendChild(app);
   editorApp.className = "editor";
   editorApp.id = `${id}editor`;
   app.appendChild(editorApp);
@@ -117,12 +119,22 @@ function CreateEditInput(id, editorApp) {
   ];
 
   modeDivData.forEach((data) => {
-    let mode = document.createElement("div");
+    let mode;
+    if (data.id === "editMode") {
+      mode = document.createElement("div");
+      mode.addEventListener("click", () => CheckFormat(id));
+      mode.addEventListener("keydown", () => CheckFormat(id));
+      mode.contentEditable = "true";
+    } else if (data.id === "htmlMode") {
+      mode = document.createElement("div");
+      // textareaMode = document.createElement("textarea");
+      // mode.appendChild(textareaMode)
+      // mode.contentEditable = "true";
+    } else {
+      mode = document.createElement("div");
+    }
     mode.className = "inputEdit";
     mode.id = `${id}_${data.id}`;
-    mode.contentEditable = "true";
-    mode.addEventListener("click", () => CheckFormat(id));
-    mode.addEventListener("keydown", () => CheckFormat(id));
     mode.style.display = data.display;
     editorApp.appendChild(mode);
 
