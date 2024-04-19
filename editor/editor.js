@@ -122,6 +122,7 @@ function CreateEditInput(id, editorApp) {
     mode.id = `${id}_${data.id}`;
     mode.contentEditable = "true";
     mode.addEventListener("click", () => CheckFormat(id));
+    mode.addEventListener("keydown", () => CheckFormat(id));
     mode.style.display = data.display;
     editorApp.appendChild(mode);
 
