@@ -92,17 +92,22 @@ function CreateToolbar(id, editorApp, func) {
   func.appendChild(headingSelect);
 
   const modeButtonData = [
-    { value: "edit", checked: true, text: "편집모드" },
-    { value: "html", checked: false, text: "HTML모드" },
-    { value: "preview", checked: false, text: "미리보기" },
+    { name: "edit", checked: true, value: "편집모드" },
+    { name: "html", checked: false, value: "HTML모드" },
+    { name: "preview", checked: false, value: "미리보기" },
   ];
 
   modeButtonData.forEach((data) => {
     const modeBtn = document.createElement("input");
     modeBtn.type = "button";
-    modeBtn.id = `${id}_mode_${data.value}`;
+    modeBtn.id = `${id}_mode_${data.name}`;
     modeBtn.className = "modeBtn";
-    modeBtn.value = data.text;
+    modeBtn.value = data.value;
+    modeBtn.name = data.name;
+    if (data.checked) {
+      modeBtn.style.backgroundColor = "#6d9eec";
+      modeBtn.style.color = "#fff";
+    }
     modeBtn.addEventListener("click", () => ChangeMode(id, data));
 
     func.appendChild(modeBtn);
@@ -112,9 +117,9 @@ function CreateToolbar(id, editorApp, func) {
 // edit input
 function CreateEditInput(id, editorApp) {
   const modeDivData = [
-    { id: "editMode", display: "block" },
-    { id: "htmlMode", display: "none" },
-    { id: "preViewMode", display: "none" },
+    { name: "edit", id: "editMode", display: "block" },
+    { name: "html", id: "htmlMode", display: "none" },
+    { name: "preview", id: "preViewMode", display: "none" },
   ];
 
   modeDivData.forEach((data) => {
@@ -135,6 +140,7 @@ function CreateEditInput(id, editorApp) {
     mode.className = "inputEdit";
     mode.id = `${id}_${data.id}`;
     mode.style.display = data.display;
+    mode.name = data.name;
     editorApp.appendChild(mode);
 
     defaultText = "<p></br></p>";
@@ -304,51 +310,96 @@ function CheckFormat(id) {
 
 // 모드 변환 + 조절된 높이 모드에 넘겨주는 함수
 function ChangeMode(id, btn) {
-  console.log(id);
-  console.log("btn: ",btn);
+  const formatButtons = document.querySelectorAll(".formatBtn");
+  const selectBox = document.querySelector(".selectBox");
   const editMode = document.querySelector(`#${id}_editMode`);
   const htmlMode = document.querySelector(`#${id}_htmlMode`);
   const preViewMode = document.querySelector(`#${id}_preViewMode`);
-  const modeArray = [ editMode, htmlMode, preViewMode ]
-  
+  const modeArray = [editMode, htmlMode, preViewMode];
+  const editBtn = document.querySelector(`#${id}_mode_edit`);
+  const htmlBtn = document.querySelector(`#${id}_mode_html`);
+  const previewBtn = document.querySelector(`#${id}_mode_preview`);
+  const modeBtnArray = [editBtn, htmlBtn, previewBtn];
+
   let beforeMode = null || editMode;
-  
+  let nowMode = null || editMode;
+
   // const 클릭 전 모드 확인 후, 높이 저장
   modeArray.forEach((mode) => {
-    const displayElement = window.getComputedStyle(mode).getPropertyValue("display");
+    const displayElement = window
+      .getComputedStyle(mode)
+      .getPropertyValue("display");
     if (displayElement === "block") {
       beforeMode = mode;
     }
-  })
-  const beforeModeHeight = window.getComputedStyle(beforeMode).getPropertyValue("height");
-  const beforeModeWidth = window.getComputedStyle(beforeMode).getPropertyValue("width");
-  
+  });
+  const beforeModeHeight = window
+    .getComputedStyle(beforeMode)
+    .getPropertyValue("height");
+  const beforeModeWidth = window
+    .getComputedStyle(beforeMode)
+    .getPropertyValue("width");
 
-  switch (btn.value) {
+  // 서식 버튼 활성화/비활성화
+  const formatBtnOn = () => {
+    formatButtons.forEach((btn) => {
+      btn.style.pointerEvents = "auto";
+      btn.style.color = "black";
+    });
+    selectBox.removeAttribute("disabled");
+    selectBox.style.color = "black";
+  };
+  const formatBtnOff = () => {
+    formatButtons.forEach((btn) => {
+      btn.style.pointerEvents = "none";
+      btn.style.color = "#d0d0d0";
+    });
+    selectBox.disabled = "disabled";
+    selectBox.style.color = "black";
+  };
+
+  switch (btn.name) {
     case "edit":
+      // editMode.innerHTML = htmlMode.innerText;
+      console.log(htmlMode.innerText)
+      console.log(editMode.innerHTML)
       editMode.style.display = "block";
       htmlMode.style.display = "none";
       preViewMode.style.display = "none";
       editMode.style.height = beforeModeHeight;
+      nowMode = editMode;
+      formatBtnOn();
       break;
     case "html":
       htmlMode.innerText = editMode.innerHTML;
+      // console.log(htmlMode.innerText)
+      // console.log(editMode.innerHTML)
       editMode.style.display = "none";
       htmlMode.style.display = "block";
       preViewMode.style.display = "none";
       htmlMode.style.height = beforeModeHeight;
       htmlMode.style.width = beforeModeWidth;
+      nowMode = htmlMode;
+      formatBtnOff();
       break;
     case "preview":
       editMode.style.display = "none";
       htmlMode.style.display = "none";
       preViewMode.style.display = "block";
       preViewMode.style.height = beforeModeHeight;
+      nowMode = preViewMode;
+      formatBtnOff();
       break;
   }
-}
 
-// 조절된 높이 모드에 넘겨주는 함수
-function ChangeHeight () {
-  const resizer = document.getElementById('')
+  // 모드 버튼 동기화
+  modeBtnArray.forEach((btn) => {
+    if (nowMode.name === btn.name) {
+      btn.style.backgroundColor = "#6d9eec";
+      btn.style.color = "#fff";
+    } else {
+      btn.style.backgroundColor = "#e9e9e9";
+      btn.style.color = "#242424";
+    }
+  });
 }
