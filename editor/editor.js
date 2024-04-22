@@ -94,6 +94,7 @@ function CreateToolbar(id, editorApp, func) {
     option.value = data.value;
     option.text = data.text;
     option.id = `${id}_headingOption_${data.value}`;
+    option.className = `${id}_headingOption`;
     headingSelect.appendChild(option);
   });
 
@@ -267,6 +268,7 @@ function CheckJustify(id) {
 
 // 서식 버튼 동기화 함수
 function CheckFormat(id) {
+  const selection = document.getSelection();
   const btnBold = document.querySelector(`#${id}_formatBtn_bold`);
   const btnItalic = document.querySelector(`#${id}_formatBtn_italic`);
   const btnStrikethrough = document.querySelector(
@@ -299,29 +301,32 @@ function CheckFormat(id) {
     ? (btnRight.style.color = "#2673f0")
     : (btnRight.style.color = "black");
 
-  // if (selection.rangeCount > 0) {
-  //     let range = selection.getRangeAt(0);
-  //     let parentElement = range.startContainer.parentElement;
+    if (selection.rangeCount > 0) {
+      let range = selection.getRangeAt(0);
+      let parentElement = range.startContainer.parentElement;
+      const hTags = ["p", "h1", "h2", "h3", "h4", "h5", "h6"];
+  
+  
+      // heading tag 동기화
+      const selectBox = document.querySelector(`#${id}_headingSelect`);
+      const options = selectBox.querySelectorAll(`.${id}_headingOption`);
+      while (!hTags.includes(parentElement.localName) && (parentElement.localName !== 'div')) {
+        parentElement = parentElement.parentElement;
+  
+        if (hTags.includes(parentElement.localName)) break;
+      }
 
-  //     if(parentElement.localName==='div') {
-  //     btnBold.style.color = 'black';
-  //     btnItalic.style.color = 'black';
-  //     btnStrikethrough.style.color = 'black';
-  //     btnUnderline.style.color = 'black';
-  //     }
-
-  //     while(parentElement.localName!=='div') {
-
-  //         if (parentElement.localName === "b") btnBold.style.color = '#2673f0';
-  //         if (parentElement.localName === "i") btnItalic.style.color = '#030303';
-  //         if (parentElement.localName === "strike") btnStrikethrough.style.color = '#2673f0';
-  //         if (parentElement.localName === "u") btnUnderline.style.color = '#2673f0';
-
-  //         parentElement = parentElement.parentElement;
-
-  //         if(parentElement.localName==='div') break;
-  //     }
-  // }
+  
+      if (hTags.includes(parentElement.localName)) {
+        for (i = 0; i < hTags.length; i++) {
+          if (options[i].value === parentElement.localName) {
+            options[i].selected = true;
+          } else {
+            options[i].selected = false;
+          }
+        }
+      }
+    }
 }
 
 // 포커스를 저장하는 함수
