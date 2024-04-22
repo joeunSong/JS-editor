@@ -2,6 +2,8 @@ function Editor(id) {
   this.id = id;
 }
 
+let savedSelection;
+
 const buttonIcon = {
   bold: "fa-regular fa-b",
   italic: "fa-solid fa-italic",
@@ -67,19 +69,25 @@ function CreateToolbar(id, editorApp, func) {
   });
 
   // toolbar selectBox
+  const headingData = [
+    { text: "기본값", value: "p" },
+    { text: "Heading 1", value: "h1" },
+    { text: "Heading 2", value: "h2" },
+    { text: "Heading 3", value: "h3" },
+    { text: "Heading 4", value: "h4" },
+    { text: "Heading 5", value: "h5" },
+    { text: "Heading 6", value: "h6" },
+  ];
+
   const headingSelect = document.createElement("select");
   headingSelect.id = `${id}_headingSelect`;
   headingSelect.name = "heading";
   headingSelect.className = "selectBox";
-
-  const headingData = [
-    { text: "Heading 1", value: "heading1" },
-    { text: "Heading 2", value: "heading2" },
-    { text: "Heading 3", value: "heading3" },
-    { text: "Heading 4", value: "heading4" },
-    { text: "Heading 5", value: "heading5" },
-    { text: "Heading 6", value: "heading6" },
-  ];
+  headingSelect.addEventListener("change", (e) => {
+    saveSelection();
+    ChangeHeading(id, e.target.value);
+    restoreSelection();
+  });
 
   headingData.forEach((data) => {
     let option = document.createElement("option");
@@ -128,6 +136,7 @@ function CreateEditInput(id, editorApp) {
       mode = document.createElement("div");
       mode.addEventListener("click", () => CheckFormat(id));
       mode.addEventListener("keydown", () => CheckFormat(id));
+      mode.addEventListener("input", () => divInput(id, mode));
       mode.contentEditable = "true";
     } else if (data.id === "htmlMode") {
       mode = document.createElement("textarea");
@@ -143,7 +152,7 @@ function CreateEditInput(id, editorApp) {
     mode.name = data.name;
     editorApp.appendChild(mode);
 
-    defaultText = "<p></br></p>";
+    let defaultText = "<p></br></p>";
 
     if (data.id === "editMode") {
       mode.innerHTML = defaultText;
@@ -200,6 +209,15 @@ function CreateFormatBtn(id, btnId, format) {
   return newBtn;
 }
 
+let sharedContent = "";
+// editor input에 쓴 글 관리
+function divInput(id, mode) {
+  const selection = window.getSelection();
+  const range = selection.getRangeAt(0);
+
+  sharedContent = mode.innerHTML;
+}
+
 // b, i, strike, u 서식 기능
 function execFunction(format, btn) {
   document.execCommand(format);
@@ -249,8 +267,6 @@ function CheckJustify(id) {
 
 // 서식 버튼 동기화 함수
 function CheckFormat(id) {
-  // const selection = document.getSelection();
-
   const btnBold = document.querySelector(`#${id}_formatBtn_bold`);
   const btnItalic = document.querySelector(`#${id}_formatBtn_italic`);
   const btnStrikethrough = document.querySelector(
@@ -308,6 +324,80 @@ function CheckFormat(id) {
   // }
 }
 
+// 포커스를 저장하는 함수
+function saveSelection() {
+  savedSelection = document.getSelection().getRangeAt(0).cloneRange();
+}
+
+// 저장한 포커스를 다시 설정하는 함수
+function restoreSelection() {
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(savedSelection);
+}
+
+// heading 기능 동기화
+function ChangeHeading(id, hTag) {
+  const editMode = document.querySelector(`#${id}_editMode`);
+  const selection = document.getSelection();
+  const range = selection.getRangeAt(0);
+  let nodes_str = "";
+  const editDiv = Array.from(
+    document.querySelector(`#${id}_editMode`).childNodes
+  );
+
+  // 한 줄 선택할 경우
+  if (range.endContainer === range.startContainer) {
+    editDiv.forEach((element) => {
+      let element_str = element.outerHTML;
+      if (element.contains(range.startContainer)) {
+        nodes_str += element_str.replace(
+          /<(\/?)(p|h[1-6])>/g,
+          function (match, p1, p2) {
+            return p1 === "/" ? `</${hTag}>` : `<${hTag}>`;
+          }
+        );
+      } else {
+        nodes_str += element_str;
+      }
+    });
+    sharedContent = nodes_str;
+    editMode.innerHTML = sharedContent;
+  }
+
+  // 여러줄 선택할 경우
+  if (
+    !selection.isCollapsed &&
+    range.commonAncestorContainer.childNodes.length
+  ) {
+    const selectionArray = Array.from(range.commonAncestorContainer.childNodes);
+    let isSelection = false;
+
+    selectionArray.forEach((element) => {
+      let element_str = element.outerHTML;
+      if (element.contains(range.startContainer)) {
+        isSelection = true;
+      }
+      if (isSelection) {
+        nodes_str += element_str.replace(
+          /<(\/?)(p|h[1-6])>/g,
+          function (match, p1, p2) {
+            return p1 === "/" ? `</${hTag}>` : `<${hTag}>`;
+          }
+        );
+      }
+      if (!isSelection) {
+        nodes_str += element_str;
+      }
+      if (element.contains(range.endContainer)) {
+        isSelection = false;
+      }
+    });
+    sharedContent = nodes_str;
+    editMode.innerHTML = sharedContent;
+  }
+}
+
 // 모드 변환 + 조절된 높이 모드에 넘겨주는 함수
 function ChangeMode(id, btn) {
   const formatButtons = document.querySelectorAll(".formatBtn");
@@ -360,9 +450,7 @@ function ChangeMode(id, btn) {
 
   switch (btn.name) {
     case "edit":
-      // editMode.innerHTML = htmlMode.innerText;
-      console.log(htmlMode.innerText)
-      console.log(editMode.innerHTML)
+      editMode.innerHTML = sharedContent;
       editMode.style.display = "block";
       htmlMode.style.display = "none";
       preViewMode.style.display = "none";
@@ -371,9 +459,7 @@ function ChangeMode(id, btn) {
       formatBtnOn();
       break;
     case "html":
-      htmlMode.innerText = editMode.innerHTML;
-      // console.log(htmlMode.innerText)
-      // console.log(editMode.innerHTML)
+      htmlMode.textContent = sharedContent;
       editMode.style.display = "none";
       htmlMode.style.display = "block";
       preViewMode.style.display = "none";
@@ -383,6 +469,7 @@ function ChangeMode(id, btn) {
       formatBtnOff();
       break;
     case "preview":
+      preViewMode.innerHTML = sharedContent;
       editMode.style.display = "none";
       htmlMode.style.display = "none";
       preViewMode.style.display = "block";
