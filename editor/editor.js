@@ -3,6 +3,7 @@ function Editor(id) {
 }
 
 let savedSelection;
+let sharedContent = "<p><br/></p>";
 
 const buttonIcon = {
   bold: "fa-regular fa-b",
@@ -135,12 +136,15 @@ function CreateEditInput(id, editorApp) {
     let mode;
     if (data.id === "editMode") {
       mode = document.createElement("div");
-      mode.addEventListener("click", () => CheckFormat(id));
+      mode.addEventListener("click", () => {
+        CheckFormat(id);
+      });
       mode.addEventListener("keydown", () => CheckFormat(id));
-      mode.addEventListener("input", () => divInput(id, mode));
+      mode.addEventListener("input", () => divInput(mode));
       mode.contentEditable = "true";
     } else if (data.id === "htmlMode") {
       mode = document.createElement("textarea");
+      mode.addEventListener("input", () => divInput(mode));
       // textareaMode = document.createElement("textarea");
       // mode.appendChild(textareaMode)
       // mode.contentEditable = "true";
@@ -210,13 +214,11 @@ function CreateFormatBtn(id, btnId, format) {
   return newBtn;
 }
 
-let sharedContent = "";
 // editor input에 쓴 글 관리
-function divInput(id, mode) {
-  const selection = window.getSelection();
-  const range = selection.getRangeAt(0);
-
+function divInput(mode) {
   sharedContent = mode.innerHTML;
+  // console.log(sharedContent)
+  console.log(sharedContent);
 }
 
 // b, i, strike, u 서식 기능
@@ -301,35 +303,132 @@ function CheckFormat(id) {
     ? (btnRight.style.color = "#2673f0")
     : (btnRight.style.color = "black");
 
-    if (selection.rangeCount > 0) {
-      let range = selection.getRangeAt(0);
-      let parentElement = range.startContainer.parentElement;
-      const hTags = ["p", "h1", "h2", "h3", "h4", "h5", "h6"];
-  
-  
-      // heading tag 동기화
-      const selectBox = document.querySelector(`#${id}_headingSelect`);
-      const options = selectBox.querySelectorAll(`.${id}_headingOption`);
-      while (!hTags.includes(parentElement.localName) && (parentElement.localName !== 'div')) {
-        parentElement = parentElement.parentElement;
-  
-        if (hTags.includes(parentElement.localName)) break;
-      }
+  if (selection.rangeCount > 0) {
+    let range = selection.getRangeAt(0);
+    let parentElement = range.startContainer.parentElement;
+    const hTags = ["p", "h1", "h2", "h3", "h4", "h5", "h6"];
 
-  
-      if (hTags.includes(parentElement.localName)) {
-        for (i = 0; i < hTags.length; i++) {
-          if (options[i].value === parentElement.localName) {
-            options[i].selected = true;
-          } else {
-            options[i].selected = false;
-          }
+    // heading tag 동기화
+    const selectBox = document.querySelector(`#${id}_headingSelect`);
+    const options = selectBox.querySelectorAll(`.${id}_headingOption`);
+    while (
+      !hTags.includes(parentElement.localName) &&
+      parentElement.localName !== "div"
+    ) {
+      parentElement = parentElement.parentElement;
+
+      if (hTags.includes(parentElement.localName)) break;
+    }
+
+    if (hTags.includes(parentElement.localName)) {
+      for (i = 0; i < hTags.length; i++) {
+        if (options[i].value === parentElement.localName) {
+          options[i].selected = true;
+        } else {
+          options[i].selected = false;
         }
       }
     }
+  }
 }
 
-// 포커스를 저장하는 함수
+// 선택영역 -> span
+function SpanArea() {
+  const selection = document.getSelection();
+  const range = selection.getRangeAt(0);
+  const rangeCopy = range.cloneRange();
+  rangeCopy.collapse(false);
+
+  const startSpan = document.createElement("span");
+  startSpan.id = "start_span";
+
+  const endSpan = document.createElement("span");
+  endSpan.id = "end_span";
+
+  range.insertNode(startSpan);
+  rangeCopy.insertNode(endSpan);
+}
+
+// span -> 선택영역
+function SelectionArea() {
+  const startSpan = document.querySelector("#start_span");
+  const endSpan = document.querySelector("#end_span");
+
+  // span태그 영역 지정
+  const spanRange = document.createRange();
+  spanRange.setStart(startSpan,0);
+  spanRange.setEnd(endSpan,0);
+
+  console.log("spanRange: ", spanRange)
+
+  startSpan.parentNode.removeChild(startSpan);
+  endSpan.parentNode.removeChild(endSpan);
+
+  // // startSpan 뒷 노드와 endSpan 앞 노드 추출
+  // let childStartNode = spanRange.startContainer.nextSibling;
+  // let childEndNode = spanRange.endContainer.previousSibling;
+
+  // console.log("spanRange: ", spanRange.endContainer)
+  // console.log("childStartNode:", childStartNode);
+  // console.log("childEndNode:", childEndNode);
+
+  // let nodeList = [];
+
+  // while (true) {
+  //   nodeList.push(childStartNode);
+  //   if (childStartNode === childEndNode) break;
+  //   childStartNode = childStartNode.nextSibling;
+  // console.log(nodeList);
+  // }
+
+
+  // const changeParent = (node) => {
+  //   const newNode = document.createElement(hTag);
+
+  //   while (node.firstChild) {
+  //     newNode.appendChild(node.firstChild);
+  //   }
+
+  //   node.parentNode.replaceChild(newNode, node);
+  //   newNode.style.textAlign = node.style.textAlign;
+  // };
+
+  // console.log(nodeList);
+
+  
+  // console.log("startSpan:", startSpan);
+  // console.log("endSpan:", endSpan);
+  // console.log("nextElementSibling:", startSpan.nextSibling);
+  // console.log("nextElementSibling:", endSpan.previousSibling);
+  // console.log("Start container:", spanRange.startContainer);
+  // console.log("Start offset:", spanRange.startOffset);
+  // console.log("End container:", spanRange.endContainer);
+  // console.log("End offset:", spanRange.endOffset);
+
+  // // 같으면 넣어줌
+  // if (startSpan.nextSibling === endSpan.previousSibling) {
+  //   console.log("같음");
+  //   const selectionContents = startSpan.nextSibling();
+
+  //   spanRange.insertBefore(selectionContents, startSpan.nextSibling);
+  //   console.log("spanRange:", spanRange);
+
+  //   startSpan.parentNode.removeChild(startSpan);
+  //   endSpan.parentNode.removeChild(endSpan);
+  // }
+
+  // // const selectionContents = spanRange.childNode();
+  // console.log("11111111: ",spanRange)
+  // console.log("222222222: ",startSpan)
+  // console.log(spanRange.parentNode)
+
+  // const parentNode = startSpan.parentNode;
+  //   parentNode.replaceChild(selectionContents, startSpan);
+  //   // parentNode.removeChild(startSpan)
+  //   parentNode.removeChild(endSpan);
+}
+
+// 포커스를 저장하는 함수F
 function saveSelection() {
   savedSelection = document.getSelection().getRangeAt(0).cloneRange();
 }
@@ -344,63 +443,66 @@ function restoreSelection() {
 // heading 기능 동기화
 function ChangeHeading(id, hTag) {
   const editMode = document.querySelector(`#${id}_editMode`);
+
   const selection = document.getSelection();
   const range = selection.getRangeAt(0);
-  let nodes_str = "";
-  const editDiv = Array.from(
-    document.querySelector(`#${id}_editMode`).childNodes
-  );
+  let startParentLine = range.startContainer.parentElement;
+  let endParentLine = range.endContainer.parentElement;
 
-  // 한 줄 선택할 경우
-  if (range.endContainer === range.startContainer) {
-    editDiv.forEach((element) => {
-      let element_str = element.outerHTML;
-      if (element.contains(range.startContainer)) {
-        nodes_str += element_str.replace(
-          /<(\/?)(p|h[1-6])>/g,
-          function (match, p1, p2) {
-            return p1 === "/" ? `</${hTag}>` : `<${hTag}>`;
-          }
-        );
-      } else {
-        nodes_str += element_str;
-      }
-    });
-    sharedContent = nodes_str;
-    editMode.innerHTML = sharedContent;
+  const lineTags = ["p", "h1", "h2", "h3", "h4", "h5", "h6"];
+
+  // 최상위 라인찾기
+  const parentLineNode = (parentLine) => {
+    while (
+      !lineTags.includes(parentLine.localName) &&
+      parentLine.localName !== "div"
+    ) {
+      parentLine = parentLine.parentElement;
+
+      if (lineTags.includes(parentLine.localName)) break;
+    }
+    return parentLine;
+  };
+
+  // 부모의 자식 노드 찾기
+  let childStartNode = parentLineNode(startParentLine);
+  let childEndNode = parentLineNode(endParentLine);
+
+  console.log("최상단: ", childStartNode);
+  console.log(childEndNode);
+
+  // nodeList에 라인별로 배열요소로 들어감
+  let nodeList = [];
+
+  while (true) {
+    nodeList.push(childStartNode);
+    if (childStartNode === childEndNode) break;
+    childStartNode = childStartNode.nextSibling;
   }
 
-  // 여러줄 선택할 경우
-  if (
-    !selection.isCollapsed &&
-    range.commonAncestorContainer.childNodes.length
-  ) {
-    const selectionArray = Array.from(range.commonAncestorContainer.childNodes);
-    let isSelection = false;
+  console.log(nodeList);
 
-    selectionArray.forEach((element) => {
-      let element_str = element.outerHTML;
-      if (element.contains(range.startContainer)) {
-        isSelection = true;
-      }
-      if (isSelection) {
-        nodes_str += element_str.replace(
-          /<(\/?)(p|h[1-6])>/g,
-          function (match, p1, p2) {
-            return p1 === "/" ? `</${hTag}>` : `<${hTag}>`;
-          }
-        );
-      }
-      if (!isSelection) {
-        nodes_str += element_str;
-      }
-      if (element.contains(range.endContainer)) {
-        isSelection = false;
-      }
-    });
-    sharedContent = nodes_str;
-    editMode.innerHTML = sharedContent;
-  }
+  SpanArea();
+
+  // 바뀐 hTag에 자식 노드 넣어주기
+  const changeParent = (node) => {
+    const newNode = document.createElement(hTag);
+
+    while (node.firstChild) {
+      newNode.appendChild(node.firstChild);
+    }
+
+    node.parentNode.replaceChild(newNode, node);
+    newNode.style.textAlign = node.style.textAlign;
+  };
+
+  nodeList.forEach((node) => changeParent(node));
+
+  // console.log("range: ",range)
+
+  SelectionArea();
+
+  sharedContent = editMode.innerHTML;
 }
 
 // 모드 변환 + 조절된 높이 모드에 넘겨주는 함수
@@ -464,7 +566,7 @@ function ChangeMode(id, btn) {
       formatBtnOn();
       break;
     case "html":
-      htmlMode.textContent = sharedContent;
+      htmlMode.innerText = sharedContent;
       editMode.style.display = "none";
       htmlMode.style.display = "block";
       preViewMode.style.display = "none";
@@ -494,4 +596,9 @@ function ChangeMode(id, btn) {
       btn.style.color = "#242424";
     }
   });
+}
+
+// 이미지 업로드 기능
+function imageUpload () {
+  
 }
