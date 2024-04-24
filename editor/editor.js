@@ -10,12 +10,10 @@ const buttonIcon = {
   italic: "fa-solid fa-italic",
   strikeThrough: "fa-solid fa-strikethrough",
   underline: "fa-solid fa-underline",
-  "btn-ul": "fa-solid fa-list-ul",
-  "btn-ol": "fa-solid fa-list-ol",
   justifyLeft: "fa-solid fa-align-left",
   justifyCenter: "fa-solid fa-align-center",
   justifyRight: "fa-solid fa-align-right",
-  "btn-image": "fa-regular fa-image",
+  btn_image: "fa-regular fa-image",
 };
 
 // 사용자가 서식 버튼 설정
@@ -24,12 +22,10 @@ const formatBtn = [
   "italic",
   "strikeThrough",
   "underline",
-  "btn-ul",
-  "btn-ol",
   "justifyLeft",
   "justifyCenter",
   "justifyRight",
-  "btn-image",
+  "btn_image",
 ];
 
 /**
@@ -141,7 +137,13 @@ function CreateEditInput(id, editorApp) {
       });
       mode.addEventListener("keydown", () => CheckFormat(id));
       mode.addEventListener("input", () => divInput(mode));
+      mode.addEventListener("drop", (e) => {
+        e.preventDefault();
+  const { files } = e.dataTransfer;
+        imageUpload(e, id, files)
+      });
       mode.contentEditable = "true";
+      document.execCommand("defaultParagraphSeparator", false, "p");
     } else if (data.id === "htmlMode") {
       mode = document.createElement("textarea");
       mode.addEventListener("input", () => divInput(mode));
@@ -175,9 +177,9 @@ function CreateFormatBtn(id, btnId, format) {
   const newI = document.createElement("i");
   newI.className = buttonIcon[format];
 
-  const newBtn = document.createElement("button");
-  newBtn.id = `${id}${btnId}`;
-  newBtn.className = "formatBtn";
+  let newBtn;
+  let newLabel;
+  let newInput;
 
   const isFormat = [
     "bold",
@@ -202,6 +204,9 @@ function CreateFormatBtn(id, btnId, format) {
   );
 
   if (isFormat) {
+    newBtn = document.createElement("button");
+    newBtn.id = `${id}${btnId}`;
+    newBtn.className = "formatBtn";
     newBtn.addEventListener("click", () => {
       execFunction(format, newBtn);
 
@@ -209,16 +214,34 @@ function CreateFormatBtn(id, btnId, format) {
         CheckJustify(id);
       }
     });
+  } else if (format === "btn_image") {
+    newInput = document.createElement("input");
+    newInput.type = "file";
+    newInput.accept = "image/*";
+    newInput.multiple = true;
+    newInput.style.display = "none";
+    newInput.id = `${id}_file_input`;
+    newInput.addEventListener("change", (e) => {
+      const files = e.currentTarget.files;
+      imageUpload(e, id, files)
+    });
+
+    newLabel = document.createElement("label");
+    newLabel.setAttribute("for", `${id}_file_input`);
+
+    newBtn = document.createElement("div");
+    newBtn.id = `${id}${btnId}`;
+    newBtn.className = "formatBtn";
+    newLabel.appendChild(newBtn);
+    newLabel.appendChild(newInput);
   }
   newBtn.appendChild(newI);
-  return newBtn;
+  return format !== "btn_image" ? newBtn : newLabel;
 }
 
 // editor input에 쓴 글 관리
 function divInput(mode) {
   sharedContent = mode.innerHTML;
-  // console.log(sharedContent)
-  console.log(sharedContent);
 }
 
 // b, i, strike, u 서식 기능
@@ -246,26 +269,6 @@ function CheckJustify(id) {
       ? (btnRight.style.color = "#2673f0")
       : (btnRight.style.color = "black");
   }
-
-  // const range = document.getSelection().getRangeAt(0);
-  // const rangeElement = range.startContainer.parentElement;
-  // const elementTextAlign = window
-  //   .getComputedStyle(rangeElement)
-  //   .getPropertyValue("text-align");
-
-  // justifyArray.forEach((button) => {
-  //   format === elementTextAlign
-  //     ? (button.style.color = "#2673f0")
-  //     : (button.style.color = "black");
-  //   format === elementTextAlign
-  //     ? (button.style.color = "#2673f0")
-  //     : (button.style.color = "black");
-  //   format === elementTextAlign
-  //     ? (button.style.color = "#2673f0")
-  //     : (button.style.color = "black");
-  // });
-
-  // return elementTextAlign;
 }
 
 // 서식 버튼 동기화 함수
@@ -356,10 +359,10 @@ function SelectionArea() {
 
   // span태그 영역 지정
   const spanRange = document.createRange();
-  spanRange.setStart(startSpan,0);
-  spanRange.setEnd(endSpan,0);
+  spanRange.setStart(startSpan, 0);
+  spanRange.setEnd(endSpan, 0);
 
-  console.log("spanRange: ", spanRange)
+  console.log("spanRange: ", spanRange);
 
   startSpan.parentNode.removeChild(startSpan);
   endSpan.parentNode.removeChild(endSpan);
@@ -381,7 +384,6 @@ function SelectionArea() {
   // console.log(nodeList);
   // }
 
-
   // const changeParent = (node) => {
   //   const newNode = document.createElement(hTag);
 
@@ -395,7 +397,6 @@ function SelectionArea() {
 
   // console.log(nodeList);
 
-  
   // console.log("startSpan:", startSpan);
   // console.log("endSpan:", endSpan);
   // console.log("nextElementSibling:", startSpan.nextSibling);
@@ -599,6 +600,38 @@ function ChangeMode(id, btn) {
 }
 
 // 이미지 업로드 기능
-function imageUpload () {
-  
+function imageUpload(e, id, files) {
+  const editMode = document.querySelector(`#${id}_editMode`);
+  const maxSize = 5 * 1024 *1024; // 한 이미지의 최대 용량 2MB ~ 5MB 적당
+  let fileSize;
+
+  // 넘어온 파일들 하나씩 처리
+  for (const file of files) {
+
+    // 하나라도 이미지 파일이 아닐 경우 & 파일 사이즈 제한
+    let filSize = file.size;
+    if (!file.type.includes("image/")) {
+      alert("이미지 파일만 업로드 가능");
+      return;
+    } else if(fileSize > maxSize) {
+      alert("파일 사이즈는 5MB까지 가능")
+    }
+
+    // 해당 이미지를 Base64 데이터 URL로 변환
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const preview = createElement(e, file);
+      editMode.appendChild(preview);
+      sharedContent = editMode.innerHTML;
+    };
+    reader.readAsDataURL(file); // 파일 읽기 시작
+  }
+
+  // 이미지 돔 만들기
+  const createElement = (e) => {
+    const image = document.createElement("img");
+    image.setAttribute("src", e.target.result);
+    image.style.width = "30%";
+    return image;
+  }
 }
