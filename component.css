@@ -20,8 +20,12 @@
     width: 800px;
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1rem;
     text-align: center;
     margin-top: 2rem;
     height: 100%;
+}
+
+.extBtn {
+    padding: 0.5rem 2rem;
 }

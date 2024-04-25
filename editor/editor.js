@@ -28,6 +28,25 @@ const formatBtn = [
   "btn_image",
 ];
 
+// 에디터의 내용을 받아오는 함수
+Editor.prototype.getData = function () {
+  console.log(sharedContent);
+  return sharedContent;
+};
+
+// 에디터에게 내용을 보내는 함수
+Editor.prototype.setData = function (text) {
+  const editMode = document.querySelector(`#${this.id}_editMode`);
+  savedSelection = text
+  editMode.innerHTML = savedSelection;
+};
+
+Editor.prototype.startEditor = function () {
+  const editorElement = this.createEditor();
+  onInitCompleted();
+  return editorElement;
+};
+
 /**
  * 에디터 생성 함수
  * @param {string} id editor 이름
@@ -81,9 +100,7 @@ function CreateToolbar(id, editorApp, func) {
   headingSelect.name = "heading";
   headingSelect.className = "selectBox";
   headingSelect.addEventListener("change", (e) => {
-    saveSelection();
     ChangeHeading(id, e.target.value);
-    restoreSelection();
   });
 
   headingData.forEach((data) => {
@@ -139,8 +156,8 @@ function CreateEditInput(id, editorApp) {
       mode.addEventListener("input", () => divInput(mode));
       mode.addEventListener("drop", (e) => {
         e.preventDefault();
-  const { files } = e.dataTransfer;
-        imageUpload(e, id, files)
+        const { files } = e.dataTransfer;
+        imageUpload(e, id, files);
       });
       mode.contentEditable = "true";
       document.execCommand("defaultParagraphSeparator", false, "p");
@@ -223,7 +240,7 @@ function CreateFormatBtn(id, btnId, format) {
     newInput.id = `${id}_file_input`;
     newInput.addEventListener("change", (e) => {
       const files = e.currentTarget.files;
-      imageUpload(e, id, files)
+      imageUpload(e, id, files);
     });
 
     newLabel = document.createElement("label");
@@ -354,91 +371,23 @@ function SpanArea() {
 
 // span -> 선택영역
 function SelectionArea() {
+  const select = document.getSelection();
+
   const startSpan = document.querySelector("#start_span");
   const endSpan = document.querySelector("#end_span");
 
   // span태그 영역 지정
   const spanRange = document.createRange();
-  spanRange.setStart(startSpan, 0);
-  spanRange.setEnd(endSpan, 0);
+  spanRange.setStartAfter(startSpan);
+  spanRange.setEndBefore(endSpan);
 
   console.log("spanRange: ", spanRange);
 
+  select.removeAllRanges();
+  select.addRange(spanRange);
+
   startSpan.parentNode.removeChild(startSpan);
   endSpan.parentNode.removeChild(endSpan);
-
-  // // startSpan 뒷 노드와 endSpan 앞 노드 추출
-  // let childStartNode = spanRange.startContainer.nextSibling;
-  // let childEndNode = spanRange.endContainer.previousSibling;
-
-  // console.log("spanRange: ", spanRange.endContainer)
-  // console.log("childStartNode:", childStartNode);
-  // console.log("childEndNode:", childEndNode);
-
-  // let nodeList = [];
-
-  // while (true) {
-  //   nodeList.push(childStartNode);
-  //   if (childStartNode === childEndNode) break;
-  //   childStartNode = childStartNode.nextSibling;
-  // console.log(nodeList);
-  // }
-
-  // const changeParent = (node) => {
-  //   const newNode = document.createElement(hTag);
-
-  //   while (node.firstChild) {
-  //     newNode.appendChild(node.firstChild);
-  //   }
-
-  //   node.parentNode.replaceChild(newNode, node);
-  //   newNode.style.textAlign = node.style.textAlign;
-  // };
-
-  // console.log(nodeList);
-
-  // console.log("startSpan:", startSpan);
-  // console.log("endSpan:", endSpan);
-  // console.log("nextElementSibling:", startSpan.nextSibling);
-  // console.log("nextElementSibling:", endSpan.previousSibling);
-  // console.log("Start container:", spanRange.startContainer);
-  // console.log("Start offset:", spanRange.startOffset);
-  // console.log("End container:", spanRange.endContainer);
-  // console.log("End offset:", spanRange.endOffset);
-
-  // // 같으면 넣어줌
-  // if (startSpan.nextSibling === endSpan.previousSibling) {
-  //   console.log("같음");
-  //   const selectionContents = startSpan.nextSibling();
-
-  //   spanRange.insertBefore(selectionContents, startSpan.nextSibling);
-  //   console.log("spanRange:", spanRange);
-
-  //   startSpan.parentNode.removeChild(startSpan);
-  //   endSpan.parentNode.removeChild(endSpan);
-  // }
-
-  // // const selectionContents = spanRange.childNode();
-  // console.log("11111111: ",spanRange)
-  // console.log("222222222: ",startSpan)
-  // console.log(spanRange.parentNode)
-
-  // const parentNode = startSpan.parentNode;
-  //   parentNode.replaceChild(selectionContents, startSpan);
-  //   // parentNode.removeChild(startSpan)
-  //   parentNode.removeChild(endSpan);
-}
-
-// 포커스를 저장하는 함수F
-function saveSelection() {
-  savedSelection = document.getSelection().getRangeAt(0).cloneRange();
-}
-
-// 저장한 포커스를 다시 설정하는 함수
-function restoreSelection() {
-  const selection = window.getSelection();
-  selection.removeAllRanges();
-  selection.addRange(savedSelection);
 }
 
 // heading 기능 동기화
@@ -602,19 +551,18 @@ function ChangeMode(id, btn) {
 // 이미지 업로드 기능
 function imageUpload(e, id, files) {
   const editMode = document.querySelector(`#${id}_editMode`);
-  const maxSize = 5 * 1024 *1024; // 한 이미지의 최대 용량 2MB ~ 5MB 적당
+  const maxSize = 5 * 1024 * 1024; // 한 이미지의 최대 용량 2MB ~ 5MB 적당
   let fileSize;
 
   // 넘어온 파일들 하나씩 처리
   for (const file of files) {
-
     // 하나라도 이미지 파일이 아닐 경우 & 파일 사이즈 제한
     let filSize = file.size;
     if (!file.type.includes("image/")) {
       alert("이미지 파일만 업로드 가능");
       return;
-    } else if(fileSize > maxSize) {
-      alert("파일 사이즈는 5MB까지 가능")
+    } else if (fileSize > maxSize) {
+      alert("파일 사이즈는 5MB까지 가능");
     }
 
     // 해당 이미지를 Base64 데이터 URL로 변환
@@ -633,5 +581,12 @@ function imageUpload(e, id, files) {
     image.setAttribute("src", e.target.result);
     image.style.width = "30%";
     return image;
-  }
+  };
+}
+
+// 에디터가 로드된 시점을 가져오는 콜백 함수
+function onInitCompleted() {
+  // 에디터가 초기화된 후 실행할 작업을 여기에 작성
+  // 예를 들어, 초기 데이터 설정 등의 작업 수행
+  console.log("onInitCompleted");
 }

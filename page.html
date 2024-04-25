@@ -19,20 +19,36 @@
   </head>
   <body>
     <div class="container">
-      <div>
-        <script type="text/javascript">
-          const editor1 = new Editor("editor1");
-          const editorElement = editor1.createEditor();
-          const parentDiv = document.currentScript.parentNode;
-
-          parentDiv.appendChild(editorElement);
-        </script>
-      </div>
+      <div id="editorContainer"></div>
       <div class="horizonAlign">
-        <button><i class="fa-solid fa-arrow-down"></i></button>
-        <button><i class="fa-solid fa-arrow-up"></i></button>
+        <button class="extBtn" id="getBtn">
+          <i class="fa-solid fa-arrow-down"></i>
+        </button>
+        <button class="extBtn" id="setBtn">
+          <i class="fa-solid fa-arrow-up"></i>
+        </button>
       </div>
-      <div class="outViewer">sdf</div>
+      <input class="outViewer" id="view" />
     </div>
+    <script type="text/javascript">
+      const editor1 = new Editor("editor1");
+      const editorContainer = document.getElementById("editorContainer");
+      const editorElement = editor1.startEditor();
+      editorContainer.appendChild(editorElement);
+
+      const getBtn = document.querySelector("#getBtn");
+      getBtn.addEventListener("click", () => {
+        const view = document.querySelector("#view");
+        const editorData = editor1.getData();
+        console.log("editorData: ", editorData);
+        view.value = editorData;
+      });
+
+      const setBtn = document.querySelector("#setBtn");
+      setBtn.addEventListener("click", () => {
+        const view = document.querySelector("#view");
+        editor1.setData(view.value);
+      });
+    </script>
   </body>
 </html>
