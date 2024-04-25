@@ -37,7 +37,7 @@ Editor.prototype.getData = function () {
 // 에디터에게 내용을 보내는 함수
 Editor.prototype.setData = function (text) {
   const editMode = document.querySelector(`#${this.id}_editMode`);
-  savedSelection = text
+  savedSelection = text;
   editMode.innerHTML = savedSelection;
 };
 
@@ -355,26 +355,30 @@ function CheckFormat(id) {
 // 선택영역 -> span
 function SpanArea() {
   const selection = document.getSelection();
-  const range = selection.getRangeAt(0);
-  const rangeCopy = range.cloneRange();
-  rangeCopy.collapse(false);
+  if (selection.rangeCount > 0) {
 
-  const startSpan = document.createElement("span");
-  startSpan.id = "start_span";
+    const range = selection.getRangeAt(0);
+    const rangeCopy = range.cloneRange();
+    rangeCopy.collapse(false);
 
-  const endSpan = document.createElement("span");
-  endSpan.id = "end_span";
+    const startSpan = document.createElement("span");
+    startSpan.id = "start_span";
 
-  range.insertNode(startSpan);
-  rangeCopy.insertNode(endSpan);
+    const endSpan = document.createElement("span");
+    endSpan.id = "end_span";
+
+    range.insertNode(startSpan);
+    rangeCopy.insertNode(endSpan);
+  }
 }
 
 // span -> 선택영역
 function SelectionArea() {
-  const select = document.getSelection();
-
   const startSpan = document.querySelector("#start_span");
   const endSpan = document.querySelector("#end_span");
+  if (startSpan == null) return;
+
+  const select = document.getSelection();
 
   // span태그 영역 지정
   const spanRange = document.createRange();
@@ -418,9 +422,6 @@ function ChangeHeading(id, hTag) {
   let childStartNode = parentLineNode(startParentLine);
   let childEndNode = parentLineNode(endParentLine);
 
-  console.log("최상단: ", childStartNode);
-  console.log(childEndNode);
-
   // nodeList에 라인별로 배열요소로 들어감
   let nodeList = [];
 
@@ -429,8 +430,6 @@ function ChangeHeading(id, hTag) {
     if (childStartNode === childEndNode) break;
     childStartNode = childStartNode.nextSibling;
   }
-
-  console.log(nodeList);
 
   SpanArea();
 
@@ -586,7 +585,5 @@ function imageUpload(e, id, files) {
 
 // 에디터가 로드된 시점을 가져오는 콜백 함수
 function onInitCompleted() {
-  // 에디터가 초기화된 후 실행할 작업을 여기에 작성
-  // 예를 들어, 초기 데이터 설정 등의 작업 수행
   console.log("onInitCompleted");
 }
