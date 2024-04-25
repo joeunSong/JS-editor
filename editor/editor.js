@@ -1,5 +1,6 @@
-function Editor(id) {
+function Editor(id, formatBtn) {
   this.id = id;
+  this.formatBtn = formatBtn;
 }
 
 let savedSelection;
@@ -16,17 +17,6 @@ const buttonIcon = {
   btn_image: "fa-regular fa-image",
 };
 
-// 사용자가 서식 버튼 설정
-const formatBtn = [
-  "bold",
-  "italic",
-  "strikeThrough",
-  "underline",
-  "justifyLeft",
-  "justifyCenter",
-  "justifyRight",
-  "btn_image",
-];
 
 // 에디터의 내용을 받아오는 함수
 Editor.prototype.getData = function () {

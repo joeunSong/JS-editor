@@ -31,7 +31,18 @@
       <input class="outViewer" id="view" />
     </div>
     <script type="text/javascript">
-      const editor1 = new Editor("editor1");
+      // 사용자가 서식 버튼 설정
+      const formatBtn = [
+        "bold",
+        "italic",
+        "strikeThrough",
+        "underline",
+        "justifyLeft",
+        "justifyCenter",
+        "justifyRight",
+        "btn_image",
+      ];
+      const editor1 = new Editor("editor1", formatBtn);
       const editorContainer = document.getElementById("editorContainer");
       const editorElement = editor1.startEditor();
       editorContainer.appendChild(editorElement);
