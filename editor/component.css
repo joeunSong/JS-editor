@@ -13,7 +13,6 @@ textarea {
 
 .editor {
   border: none;
-  width: 100%;
   text-align: left;
 }
 
@@ -29,7 +28,6 @@ textarea {
 
 .inputEdit {
   border: 2px solid #d0d0d0;
-  height: 20rem;
   resize: vertical;
   overflow: auto;
 }

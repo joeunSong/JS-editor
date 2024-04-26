@@ -51,7 +51,9 @@
         { text: "Heading 5", value: "h5" },
         { text: "Heading 6", value: "h6" },
       ];
-      const editor1 = new Editor("editor1", formatBtn, headingData);
+      const editor1 = new Editor("editor1");
+      editor1.setFormatBtn(formatBtn)
+      editor1.setHeadingData(headingData)
       const editorContainer = document.getElementById("editorContainer");
       const editorElement = editor1.startEditor();
       editorContainer.appendChild(editorElement);

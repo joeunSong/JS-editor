@@ -1,6 +1,6 @@
-function Editor(id, formatBtn, headingData) {
+function Editor(id, customWidth, customHeight) {
   this.id = id;
-  this.formatBtn = formatBtn || [
+  this.formatBtn = [
     "bold",
     "italic",
     "strikeThrough",
@@ -10,7 +10,7 @@ function Editor(id, formatBtn, headingData) {
     "justifyRight",
     "btn_image",
   ];
-  this.headingData = headingData || [
+  this.headingData = [
     { text: "기본값", value: "p" },
     { text: "Heading 1", value: "h1" },
     { text: "Heading 2", value: "h2" },
@@ -19,6 +19,8 @@ function Editor(id, formatBtn, headingData) {
     { text: "Heading 5", value: "h5" },
     { text: "Heading 6", value: "h6" },
   ];
+  this.customWidth = customWidth || '100%'
+  this.customHeight = customHeight || '20rem'
 }
 
 let savedSelection;
@@ -35,6 +37,15 @@ const buttonIcon = {
   btn_image: "fa-regular fa-image",
 };
 
+// 사용자가 headingData를 정하는 함수
+Editor.prototype.setHeadingData = function (headingData) {
+  this.headingData = headingData;
+};
+
+// 사용자가 formatBtn를 정하는 함수
+Editor.prototype.setFormatBtn = function (formatBtn) {
+  this.formatBtn = formatBtn;
+};
 
 // 에디터의 내용을 받아오는 함수
 Editor.prototype.getData = function () {
@@ -64,25 +75,24 @@ Editor.prototype.createEditor = function () {
   const editorApp = document.createElement("div");
   const func = document.createElement("div");
 
-  CreateOutline(this.id, app, editorApp);
-  CreateToolbar(this.id, editorApp, func);
-  CreateEditInput(this.id, editorApp);
+  CreateOutline(this.id, app, editorApp, this.customWidth);
+  CreateToolbar(this.id, editorApp, func, this.formatBtn, this.headingData);
+  CreateEditInput(this.id, editorApp, this.customHeight);
 
   return app;
 };
 
 // editor outline
-function CreateOutline(id, app, editorApp) {
-  // 부모 객체 찾아서 넣기
+function CreateOutline(id, app, editorApp, customWidth) {
   app.id = id;
-  // document.body.appendChild(app);
   editorApp.className = "editor";
   editorApp.id = `${id}editor`;
+  editorApp.style.width = customWidth;
   app.appendChild(editorApp);
 }
 
 // editor toolbar
-function CreateToolbar(id, editorApp, func) {
+function CreateToolbar(id, editorApp, func, formatBtn, headingData) {
   func.className = "func";
   func.id = `${id}_func`;
   editorApp.appendChild(func);
@@ -136,7 +146,7 @@ function CreateToolbar(id, editorApp, func) {
 }
 
 // edit input
-function CreateEditInput(id, editorApp) {
+function CreateEditInput(id, editorApp, customHeight) {
   const modeDivData = [
     { name: "edit", id: "editMode", display: "block" },
     { name: "html", id: "htmlMode", display: "none" },
@@ -162,8 +172,6 @@ function CreateEditInput(id, editorApp) {
     } else if (data.id === "htmlMode") {
       mode = document.createElement("textarea");
       mode.addEventListener("input", () => divInput(mode));
-      // textareaMode = document.createElement("textarea");
-      // mode.appendChild(textareaMode)
       // mode.contentEditable = "true";
     } else {
       mode = document.createElement("div");
@@ -171,6 +179,7 @@ function CreateEditInput(id, editorApp) {
     mode.className = "inputEdit";
     mode.id = `${id}_${data.id}`;
     mode.style.display = data.display;
+    mode.style.height = customHeight;
     mode.name = data.name;
     editorApp.appendChild(mode);
 
