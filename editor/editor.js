@@ -1,6 +1,24 @@
-function Editor(id, formatBtn) {
+function Editor(id, formatBtn, headingData) {
   this.id = id;
-  this.formatBtn = formatBtn;
+  this.formatBtn = formatBtn || [
+    "bold",
+    "italic",
+    "strikeThrough",
+    "underline",
+    "justifyLeft",
+    "justifyCenter",
+    "justifyRight",
+    "btn_image",
+  ];
+  this.headingData = headingData || [
+    { text: "기본값", value: "p" },
+    { text: "Heading 1", value: "h1" },
+    { text: "Heading 2", value: "h2" },
+    { text: "Heading 3", value: "h3" },
+    { text: "Heading 4", value: "h4" },
+    { text: "Heading 5", value: "h5" },
+    { text: "Heading 6", value: "h6" },
+  ];
 }
 
 let savedSelection;
@@ -75,16 +93,6 @@ function CreateToolbar(id, editorApp, func) {
   });
 
   // toolbar selectBox
-  const headingData = [
-    { text: "기본값", value: "p" },
-    { text: "Heading 1", value: "h1" },
-    { text: "Heading 2", value: "h2" },
-    { text: "Heading 3", value: "h3" },
-    { text: "Heading 4", value: "h4" },
-    { text: "Heading 5", value: "h5" },
-    { text: "Heading 6", value: "h6" },
-  ];
-
   const headingSelect = document.createElement("select");
   headingSelect.id = `${id}_headingSelect`;
   headingSelect.name = "heading";
