@@ -72,3 +72,11 @@ textarea {
   background-color: #f8f8f8;
   color: #929292;
 }
+
+img {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+}

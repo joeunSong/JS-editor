@@ -19,11 +19,6 @@ function Editor(id, customWidth, customHeight) {
     { text: "Heading 5", value: "h5" },
     { text: "Heading 6", value: "h6" },
   ];
-  this.modeData = [
-    { name: "edit", checked: true, value: "편집모드" },
-    { name: "html", checked: false, value: "HTML모드" },
-    { name: "preview", checked: false, value: "미리보기" },
-  ];
   this.customWidth = customWidth || "100%";
   this.customHeight = customHeight || "20rem";
 }
@@ -42,11 +37,6 @@ const buttonIcon = {
   btn_image: "fa-regular fa-image",
 };
 
-// 사용자가 modeData 정하는 함수
-Editor.prototype.setModeData = function (modeData) {
-  this.modeData = modeData;
-};
-
 // 사용자가 headingData를 정하는 함수
 Editor.prototype.setHeadingData = function (headingData) {
   this.headingData = headingData;
@@ -59,8 +49,8 @@ Editor.prototype.setFormatBtn = function (formatBtn) {
 
 // 에디터의 내용을 받아오는 함수
 Editor.prototype.getData = function () {
-  const editMode = document.querySelector(`#${this.id}_editMode`);
-  return editMode.innerHTML;
+  console.log(sharedContent);
+  return sharedContent;
 };
 
 // 에디터에게 내용을 보내는 함수
@@ -70,15 +60,13 @@ Editor.prototype.setData = function (text) {
   editMode.innerHTML = savedSelection;
 };
 
-// 사용자에게 에디터를 시작을 알려주는 함수
 Editor.prototype.startEditor = function () {
   const editorElement = createEditor(
     this.id,
     this.customWidth,
     this.formatBtn,
     this.headingData,
-    this.customHeight,
-    this.modeData
+    this.customHeight
   );
   onInitCompleted();
   return editorElement;
@@ -86,27 +74,21 @@ Editor.prototype.startEditor = function () {
 
 /**
  * 에디터 생성 함수
+ * @param {string} id editor 이름
  */
-function createEditor(
-  id,
-  customWidth,
-  formatBtn,
-  headingData,
-  customHeight,
-  modeData
-) {
+function createEditor(id, customWidth, formatBtn, headingData, customHeight) {
   const app = document.createElement("div");
   const editorApp = document.createElement("div");
   const func = document.createElement("div");
 
   CreateOutline(id, app, editorApp, customWidth);
-  CreateToolbar(id, editorApp, func, formatBtn, headingData, modeData);
+  CreateToolbar(id, editorApp, func, formatBtn, headingData);
   CreateEditInput(id, editorApp, customHeight);
 
   return app;
 }
 
-// 에디터 전체를 감싸는 Dom 생성
+// editor outline
 function CreateOutline(id, app, editorApp, customWidth) {
   app.id = id;
   editorApp.className = "editor";
@@ -115,116 +97,23 @@ function CreateOutline(id, app, editorApp, customWidth) {
   app.appendChild(editorApp);
 }
 
-// 에디터 툴을 보여주는 툴바 Dom 생성
-function CreateToolbar(id, editorApp, func, formatBtn, headingData, modeData) {
+// editor toolbar
+function CreateToolbar(id, editorApp, func, formatBtn, headingData) {
   func.className = "func";
   func.id = `${id}_func`;
   editorApp.appendChild(func);
 
-  // toolbar icon button
-  formatBtn.forEach((formatName) => {
-    let buttonNode;
-
-    if (formatName === "btn_image")
-      buttonNode = CreateImageButton(id, formatName);
-    else buttonNode = CreateFormatButton(id, formatName);
-
-    func.appendChild(buttonNode);
+  // toolbar btn
+  formatBtn.forEach((button) => {
+    func.appendChild(CreateFormatBtn(id, `_formatBtn_${button}`, button));
   });
 
   // toolbar selectBox
-  const headingSelect = CreateHeadingSelect(id, headingData);
-  func.appendChild(headingSelect);
-
-  // toolbar mode button
-  modeData.forEach((mode) => {
-    const modeBtn = CreateModeButton(id, mode);
-    func.appendChild(modeBtn);
-  });
-}
-
-// 에디터 toolbar에 들어가는 서식버튼 Dom 생성
-function CreateFormatButton(id, formatName) {
-  const isJustify = ["justifyLeft", "justifyCenter", "justifyRight"].find(
-    (j) => {
-      if (j === formatName) {
-        return true;
-      }
-    }
-  );
-  const newBtn = document.createElement("button");
-  newBtn.id = `${id}_formatBtn_${formatName}`;
-  newBtn.className = "formatBtn";
-  newBtn.addEventListener("click", () => {
-    execFunction(formatName, newBtn);
-
-    if (isJustify) {
-      CheckJustify(id);
-    }
-  });
-
-  const iconNode = CreateButtonIcon(formatName);
-  newBtn.appendChild(iconNode);
-
-  return newBtn;
-}
-
-// 에디터 toolbar에 들어가는 이미지업로드 버튼 Dom 생성
-function CreateImageButton(id, formatName) {
-  // 파일 업로드 버튼 스타일 커스텀을 위해 display: none
-  const newInput = document.createElement("input");
-  newInput.type = "file";
-  newInput.accept = "image/*";
-  newInput.multiple = true;
-  newInput.style.display = "none";
-  newInput.id = `${id}_file_input`;
-  newInput.addEventListener("change", (e) => {
-    const files = e.currentTarget.files;
-    imageUpload(e, id, files);
-  });
-
-  // 커스텀 버튼에 input 기능을 연결해주기 위해 label 생성
-  const newLabel = document.createElement("label");
-  newLabel.setAttribute("for", `${id}_file_input`);
-
-  const newBtn = document.createElement("div");
-  newBtn.id = `${id}_formatBtn_${formatName}`;
-  newBtn.className = "formatBtn";
-
-  const iconNode = CreateButtonIcon(formatName);
-  newBtn.appendChild(iconNode);
-
-  newLabel.appendChild(newBtn);
-  newLabel.appendChild(newInput);
-
-  return newLabel;
-}
-
-// 에디터 toolbar - 서식버튼의 icon을 보여주는 Dom 생성
-function CreateButtonIcon(formatName) {
-  // 서식이름: 아이콘 이미지 이름
-  const buttonIcon = {
-    bold: "fa-regular fa-b",
-    italic: "fa-solid fa-italic",
-    strikeThrough: "fa-solid fa-strikethrough",
-    underline: "fa-solid fa-underline",
-    justifyLeft: "fa-solid fa-align-left",
-    justifyCenter: "fa-solid fa-align-center",
-    justifyRight: "fa-solid fa-align-right",
-    btn_image: "fa-regular fa-image",
-  };
-  const newI = document.createElement("i");
-  newI.className = buttonIcon[formatName];
-
-  return newI;
-}
-
-// 에디터 toolbar - Heading에 대한 selectBox Dom 생성
-function CreateHeadingSelect(id, headingData) {
   const headingSelect = document.createElement("select");
   headingSelect.id = `${id}_headingSelect`;
   headingSelect.name = "heading";
   headingSelect.className = "selectBox";
+    // 나중에 버튼 리스너 추가~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   headingSelect.addEventListener("change", (e) => {
     ChangeHeading(id, e.target.value);
   });
@@ -238,27 +127,33 @@ function CreateHeadingSelect(id, headingData) {
     headingSelect.appendChild(option);
   });
 
-  return headingSelect;
+  func.appendChild(headingSelect);
+
+  const modeButtonData = [
+    { name: "edit", checked: true, value: "편집모드" },
+    { name: "html", checked: false, value: "HTML모드" },
+    { name: "preview", checked: false, value: "미리보기" },
+  ];
+
+  modeButtonData.forEach((data) => {
+    const modeBtn = document.createElement("input");
+    modeBtn.type = "button";
+    modeBtn.id = `${id}_mode_${data.name}`;
+    modeBtn.className = "modeBtn";
+    modeBtn.value = data.value;
+    modeBtn.name = data.name;
+    if (data.checked) {
+      modeBtn.style.backgroundColor = "#6d9eec";
+      modeBtn.style.color = "#fff";
+    }
+    // 나중에 버튼 리스너 추가~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    modeBtn.addEventListener("click", () => ChangeMode(id, data));
+
+    func.appendChild(modeBtn);
+  });
 }
 
-// 에디터 toolbar - 모드 전환 버튼 Dom 생성
-function CreateModeButton(id, mode) {
-  const modeBtn = document.createElement("input");
-  modeBtn.type = "button";
-  modeBtn.id = `${id}_mode_${mode.name}`;
-  modeBtn.className = "modeBtn";
-  modeBtn.value = mode.value;
-  modeBtn.name = mode.name;
-  if (mode.checked) {
-    modeBtn.style.backgroundColor = "#6d9eec";
-    modeBtn.style.color = "#fff";
-  }
-  modeBtn.addEventListener("click", () => ChangeMode(id, mode));
-
-  return modeBtn;
-}
-
-// 에디터에서 글 쓰는 부분 Dom 생성
+// edit input
 function CreateEditInput(id, editorApp, customHeight) {
   const modeDivData = [
     { name: "edit", id: "editMode", display: "block" },
@@ -274,7 +169,7 @@ function CreateEditInput(id, editorApp, customHeight) {
         CheckFormat(id);
       });
       mode.addEventListener("keydown", () => CheckFormat(id));
-      mode.addEventListener("input", () => divInput(id, mode));
+      mode.addEventListener("input", () => divInput(mode));
       mode.addEventListener("drop", (e) => {
         e.preventDefault();
         const { files } = e.dataTransfer;
@@ -284,7 +179,8 @@ function CreateEditInput(id, editorApp, customHeight) {
       document.execCommand("defaultParagraphSeparator", false, "p");
     } else if (data.id === "htmlMode") {
       mode = document.createElement("textarea");
-      mode.addEventListener("input", () => divInput(id, mode));
+      mode.addEventListener("input", () => divInput(mode));
+      // mode.contentEditable = "true";
     } else {
       mode = document.createElement("div");
     }
@@ -295,15 +191,90 @@ function CreateEditInput(id, editorApp, customHeight) {
     mode.name = data.name;
     editorApp.appendChild(mode);
 
+    let defaultText = "<p></br></p>";
+
     if (data.id === "editMode") {
-      mode.innerHTML = sharedContent;
+      mode.innerHTML = defaultText;
     }
   });
 }
 
+/**
+ * 서식 버튼 UI
+ * @param {string} id editor id
+ * @param {string} btnId 버튼 고유 id
+ * @param {string} format 버튼의 서식 역할
+ */
+function CreateFormatBtn(id, btnId, format) {
+  const newI = document.createElement("i");
+  newI.className = buttonIcon[format];
+
+  let newBtn;
+  let newLabel;
+  let newInput;
+
+  const isFormat = [
+    "bold",
+    "italic",
+    "strikeThrough",
+    "underline",
+    "justifyLeft",
+    "justifyCenter",
+    "justifyRight",
+  ].find((f) => {
+    if (f === format) {
+      return true;
+    }
+  });
+
+  const isJustify = ["justifyLeft", "justifyCenter", "justifyRight"].find(
+    (j) => {
+      if (j === format) {
+        return true;
+      }
+    }
+  );
+
+  if (isFormat) {
+    newBtn = document.createElement("button");
+    newBtn.id = `${id}${btnId}`;
+    newBtn.className = "formatBtn";
+    // 나중에 버튼 리스너 추가~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    newBtn.addEventListener("click", () => {
+      execFunction(format, newBtn);
+
+      if (isJustify) {
+        CheckJustify(id);
+      }
+    });
+  } else if (format === "btn_image") {
+    newInput = document.createElement("input");
+    newInput.type = "file";
+    newInput.accept = "image/*";
+    newInput.multiple = true;
+    newInput.style.display = "none";
+    newInput.id = `${id}_file_input`;
+    // 나중에 버튼 리스너 추가~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    newInput.addEventListener("change", (e) => {
+      const files = e.currentTarget.files;
+      imageUpload(e, id, files);
+    });
+
+    newLabel = document.createElement("label");
+    newLabel.setAttribute("for", `${id}_file_input`);
+
+    newBtn = document.createElement("div");
+    newBtn.id = `${id}${btnId}`;
+    newBtn.className = "formatBtn";
+    newLabel.appendChild(newBtn);
+    newLabel.appendChild(newInput);
+  }
+  newBtn.appendChild(newI);
+  return format !== "btn_image" ? newBtn : newLabel;
+}
+
 // editor input에 쓴 글 관리
-function divInput(id, mode) {
-  if (mode.id === `${id}_editMode` && mode.innerHTML === "") sharedContent = "<p></br></p>";
+function divInput(mode) {
   sharedContent = mode.innerHTML;
 }
 

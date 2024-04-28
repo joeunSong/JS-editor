@@ -51,9 +51,15 @@
         { text: "Heading 5", value: "h5" },
         { text: "Heading 6", value: "h6" },
       ];
+      const modeData = [
+        { name: "edit", checked: true, value: "편집모드" },
+        { name: "html", checked: false, value: "HTML모드" },
+        { name: "preview", checked: false, value: "미리보기" },
+      ];
       const editor1 = new Editor("editor1");
-      editor1.setFormatBtn(formatBtn)
-      editor1.setHeadingData(headingData)
+      editor1.setFormatBtn(formatBtn);
+      editor1.setHeadingData(headingData);
+      editor1.setModeData(modeData);
       const editorContainer = document.getElementById("editorContainer");
       const editorElement = editor1.startEditor();
       editorContainer.appendChild(editorElement);
