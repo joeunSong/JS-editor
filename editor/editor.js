@@ -66,8 +66,8 @@ Editor.prototype.getData = function () {
 // 에디터에게 내용을 보내는 함수
 Editor.prototype.setData = function (text) {
   const editMode = document.querySelector(`#${this.id}_editMode`);
-  savedSelection = text;
-  editMode.innerHTML = savedSelection;
+  sharedContent = text;
+  editMode.innerHTML = sharedContent;
 };
 
 // 사용자에게 에디터를 시작을 알려주는 함수
