@@ -283,7 +283,8 @@ function CreateEditInput(id, editorApp, customHeight) {
       mode.contentEditable = "true";
       document.execCommand("defaultParagraphSeparator", false, "p");
     } else if (data.id === "htmlMode") {
-      mode = document.createElement("textarea");
+      mode = document.createElement("div");
+      mode.contentEditable = "true";
       mode.addEventListener("input", () => divInput(id, mode));
     } else {
       mode = document.createElement("div");
@@ -304,7 +305,8 @@ function CreateEditInput(id, editorApp, customHeight) {
 // editor input에 쓴 글 관리
 function divInput(id, mode) {
   if (mode.id === `${id}_editMode` && mode.innerHTML === "") sharedContent = "<p></br></p>";
-  sharedContent = mode.innerHTML;
+  else if(mode.id === `${id}_htmlMode` && mode.innerText === "") sharedContent = "<p></br></p>"
+  else sharedContent = mode.id === `${id}_editMode` ? mode.innerHTML : mode.innerText;
 }
 
 // b, i, strike, u 서식 기능
