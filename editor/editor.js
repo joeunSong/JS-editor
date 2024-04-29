@@ -1,6 +1,13 @@
-function Editor(id, customWidth, customHeight) {
+function Editor(
+  id,
+  customWidth,
+  customHeight,
+  headingData,
+  modeData,
+  formatBtn
+) {
   this.id = id;
-  this.formatBtn = [
+  this.formatBtn = formatBtn || [
     "bold",
     "italic",
     "strikeThrough",
@@ -10,7 +17,7 @@ function Editor(id, customWidth, customHeight) {
     "justifyRight",
     "btn_image",
   ];
-  this.headingData = [
+  this.headingData = headingData || [
     { text: "기본값", value: "p" },
     { text: "Heading 1", value: "h1" },
     { text: "Heading 2", value: "h2" },
@@ -19,7 +26,7 @@ function Editor(id, customWidth, customHeight) {
     { text: "Heading 5", value: "h5" },
     { text: "Heading 6", value: "h6" },
   ];
-  this.modeData = [
+  this.modeData = modeData || [
     { name: "edit", checked: true, value: "편집모드" },
     { name: "html", checked: false, value: "HTML모드" },
     { name: "preview", checked: false, value: "미리보기" },
@@ -42,20 +49,20 @@ const buttonIcon = {
   btn_image: "fa-regular fa-image",
 };
 
-// 사용자가 modeData 정하는 함수
-Editor.prototype.setModeData = function (modeData) {
-  this.modeData = modeData;
-};
+// // 사용자가 modeData 정하는 함수
+// Editor.prototype.setModeData = function (modeData) {
+//   this.modeData = modeData;
+// };
 
-// 사용자가 headingData를 정하는 함수
-Editor.prototype.setHeadingData = function (headingData) {
-  this.headingData = headingData;
-};
+// // 사용자가 headingData를 정하는 함수
+// Editor.prototype.setHeadingData = function (headingData) {
+//   this.headingData = headingData;
+// };
 
-// 사용자가 formatBtn를 정하는 함수
-Editor.prototype.setFormatBtn = function (formatBtn) {
-  this.formatBtn = formatBtn;
-};
+// // 사용자가 formatBtn를 정하는 함수
+// Editor.prototype.setFormatBtn = function (formatBtn) {
+//   this.formatBtn = formatBtn;
+// };
 
 // 에디터의 내용을 받아오는 함수
 Editor.prototype.getData = function () {
@@ -71,7 +78,7 @@ Editor.prototype.setData = function (text) {
 };
 
 // 사용자에게 에디터를 시작을 알려주는 함수
-Editor.prototype.startEditor = function () {
+Editor.prototype.startEditor = function (container) {
   const editorElement = createEditor(
     this.id,
     this.customWidth,
@@ -80,8 +87,10 @@ Editor.prototype.startEditor = function () {
     this.customHeight,
     this.modeData
   );
+  const editorContainer = document.querySelector(container);
+  editorContainer.appendChild(editorElement);
+
   onInitCompleted();
-  return editorElement;
 };
 
 /**
@@ -141,6 +150,27 @@ function CreateToolbar(id, editorApp, func, formatBtn, headingData, modeData) {
     const modeBtn = CreateModeButton(id, mode);
     func.appendChild(modeBtn);
   });
+
+  // 사이즈 온/오프 버튼
+  // const editMode = document.querySelector(`#${id}_editMode`);
+  // const htmlMode = document.querySelector(`#${id}_htmlMode`);
+  // const previewMode = document.querySelector(`#${id}_preViewMode`);
+  // let click = 'vertical';
+  // let sizeValue = '사이즈 조절 on';
+  // const resizeOnOffBtn = document.createElement("input");
+  // resizeOnOffBtn.type='button'
+  // resizeOnOffBtn.id = `${id}_resizeOnOffBtn`;
+  // resizeOnOffBtn.className = `resizeOnOffBtn`;
+  // resizeOnOffBtn.value = sizeValue;
+  // resizeOnOffBtn.addEventListener("click", () => {
+  //   editMode.style.resize = "click";
+  //   htmlMode.style.resize = "click";
+  //   previewMode.style.resize = "click";
+  //   click = click === 'vertical'? "none" : "vertical";
+  //   sizeValue = sizeValue === '사이즈 조절 on'? '사이즈 조절 off' : '사이즈 조절 on';
+  //   console.log(click)
+  // })
+  // func.appendChild(resizeOnOffBtn);
 }
 
 // 에디터 toolbar에 들어가는 서식버튼 Dom 생성
@@ -408,6 +438,7 @@ function CheckFormat(id) {
 function SpanArea() {
   const selection = document.getSelection();
   if (selection.rangeCount > 0) {
+    console.log("span");
     const range = selection.getRangeAt(0);
     const rangeCopy = range.cloneRange();
     rangeCopy.collapse(false);
@@ -557,8 +588,9 @@ function ChangeMode(id, btn) {
 
   switch (btn.name) {
     case "edit":
-      // if(beforeMode === htmlMode) syncDragSpan(htmlMode, editMode, "edit");
       editMode.innerHTML = sharedContent;
+      if (beforeMode === htmlMode) syncDragSpan(htmlMode, editMode, "edit");
+      console.log("!!!!sharedContent: ", sharedContent);
       editMode.style.display = "block";
       htmlMode.style.display = "none";
       preViewMode.style.display = "none";
@@ -567,8 +599,9 @@ function ChangeMode(id, btn) {
       formatBtnOn();
       break;
     case "html":
-      // if(beforeMode === editMode) syncDragSpan(editMode, htmlMode, "html");
       htmlMode.innerText = sharedContent;
+      if (beforeMode === editMode) syncDragSpan(editMode, htmlMode, "html");
+      console.log("!!!!sharedContent: ", sharedContent);
       editMode.style.display = "none";
       htmlMode.style.display = "block";
       preViewMode.style.display = "none";
@@ -629,8 +662,22 @@ function imageUpload(e, id, files) {
         editMode.appendChild(preview);
       } else if (eType === "drop") {
         // Range에 이미지 삽입
-        range.deleteContents();
-        range.insertNode(preview);
+        if (
+          (range.commonAncestorContainer.parentElement.id = `${id}_editMode`)
+        ) {
+          // Range 초기화
+          range.deleteContents();
+
+          // 이미지 삽입
+          range.insertNode(preview);
+
+          // Range 업데이트 (이미지 다음에 커서가 위치하도록)
+          range.setStartAfter(preview);
+          range.setEndAfter(preview);
+        }
+
+        console.log(range);
+        console.log(range.commonAncestorContainer.parentElement.id);
       }
 
       sharedContent = editMode.innerHTML;
@@ -654,12 +701,19 @@ function onInitCompleted() {
 
 // 모드 전환 시 선택영역 유지 함수
 function syncDragSpan(prevMode, nextMode, type) {
+  const selection = window.getSelection();
+  console.log("1: ", type);
+  if (!(selection && !selection.isCollapsed)) return;
   // 1. 드래그 영역 span으로 변경 (spanArea)
   SpanArea();
 
   // 2. sharedContent 업데이트
-  if (type === "edit") sharedContent = prevMode.innerText;
-  else if (type === "html") sharedContent = prevMode.innerHTML;
+  // if (type === "edit") sharedContent = prevMode.innerText;
+  // else if (type === "html") sharedContent = prevMode.innerHTML;
+  sharedContent = prevMode.innerHTML;
+  if (type === "edit")
+    sharedContent = sharedContent.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+  console.log("sharedContent: ", sharedContent);
 
   // 3. prevMode 에서는 start, end span 삭제
   const startSpan = document.querySelector("#start_span");
@@ -679,86 +733,127 @@ function syncDragSpan(prevMode, nextMode, type) {
   // sharedContent = doc.body.innerHTML;
 
   // nextMode.appendChild(fragment);
+  // const fragment = document.createRange().createContextualFragment(sharedContent);
+  //   nextMode.appendChild(fragment);
 
-  console.log(sharedContent);
+  // console.log(sharedContent);
+  // console.log(fragment.parentElement);
 
   if (type === "html") {
-    nextMode.innerHTML = sharedContent;
+    //     const regex =
+    //       /<span id="start_span"><\/span>(.*?)<span id="end_span"><\/span>/;
+    //     const match = sharedContent.match(regex);
+    //     const extractedText = match[1];
+    //     const textContent = sharedContent.replace(/<[^>]+>/g, '');
+    //     nextMode.innerText = textContent;
+    //     console.log("match: ", match);
+    //     console.log("extractedText: ", extractedText);
+    //     console.log("context: ", textContent);
+    //     // const startIndex = sharedContent.indexOf(extractedText);
+    //     // const endIndex = extractedText.length;
+    //     // console.log("startIndex: ", startIndex);
+    //     // console.log("endIndex: ", endIndex);
+    //     const range = document.createRange();
+    //     const selection = document.getSelection();
+    //     const textNode = nextMode.innerText
+    //     range.setStart(textNode, indexOf(extractedText));
+    //     range.setEnd(textNode, extractedText.length);
+    //     console.log("range: ", range);
 
-    // span 태그를 제거하고 텍스트만 추출
+    //     selection.removeAllRanges();
+    // selection.addRange(range);
+
+    console.log("2: ", type);
+
+    // span 태그안에 택스트와 span의 length 계산
+    const selectionText =
+      /<span id="start_span"><\/span>(.*?)<span id="end_span"><\/span>/;
+    const match = sharedContent.match(selectionText)[1];
     const _startSpan = '<span id="start_span"></span>';
     const startIndex = sharedContent.indexOf(_startSpan);
-    const startIndexLength = _startSpan.length;
-    console.log(sharedContent[startIndex + startIndexLength]);
-    console.log(startIndex, startIndexLength);
 
-    const _endSpan = '<span id="end_span"></span>';
-    const endIndex = sharedContent.indexOf(_endSpan);
-    // const endIndexLength = _endSpan.length;
+    // span 문자열 삭제 후, div에 넣어줌
+    sharedContent = sharedContent.replace(/<span[^>]*>[\s\S]*?<\/span>/gi, "");
+    nextMode.innerText = sharedContent;
 
-    // Range 객체 생성
+    // Range 객체 생성후 계산한 값 넣어주기
     const range = document.createRange();
     const selection = document.getSelection();
-    console.log(nextMode.firstChild);
+    console.log(nextMode);
 
-    range.setStart(nextMode.firstChild, startIndex + startIndexLength);
-    range.setEnd(nextMode.firstChild, endIndex);
+    range.setStart(nextMode.firstChild, startIndex);
+    range.setEnd(nextMode.firstChild, startIndex + match.length);
     console.log(range);
 
-    nextMode.firstChild.replace(/<[^>]+>/g, "");
     // // 선택 영역 설정
     selection.removeAllRanges();
     selection.addRange(range);
-  } else if (type === "edit") nextMode.innerText = sharedContent;
 
-  // const regex = /<span id="start_span"><\/span>(.*?)<span id="end_span"><\/span>/;
-  // const match = nextMode.innerText.match(regex);
-  // const extractedText = match[1];
-  // console.log("match: ", match)
+    return;
+  } else if (type === "edit") {
+    // nextMode.innerHTML = sharedContent;
+    const fragment = document
+      .createRange()
+      .createContextualFragment(sharedContent);
+    // nextMode.appendChild(fragment);
 
-  // // // 추출된 텍스트를 포함하는 임시 div 요소 생성
-  // const tempDiv = document.createElement('div');
-  // tempDiv.innerHTML = extractedText;
-  // nextMode.appendChild(tempDiv)
-  // console.log("tempDiv: ", tempDiv)
+    // nextMode.replaceChild(fragment, nextMode.child)
 
-  // // Range 객체 생성하여 추출된 텍스트에 대한 선택 영역 설정
-  // const selection = window.getSelection();
-  // const range = document.createRange();
+    console.log("fragment: ", fragment);
+    console.log(nextMode);
+    console.log("3: ", type);
 
-  // // 추출된 텍스트의 첫 번째 자식 노드를 시작점으로 설정
-  // if (tempDiv.firstChild) {
-  //     range.setStart(tempDiv.firstChild, 0);
-  //     range.setEnd(tempDiv.firstChild, extractedText.length); // 텍스트 길이만큼 설정
-  // }
-  // console.log(range)
+    console.log(sharedContent);
 
-  // // 선택 영역 설정
-  // selection.removeAllRanges();
-  // selection.addRange(range);
+    // const regex = /<span id="start_span"><\/span>(.*?)<span id="end_span"><\/span>/;
+    // const match = nextMode.innerText.match(regex);
+    // const extractedText = match[1];
+    // console.log("match: ", match)
 
-  // // 임시 div 요소 삭제
-  // tempDiv.remove();
+    // // // 추출된 텍스트를 포함하는 임시 div 요소 생성
+    // const tempDiv = document.createElement('div');
+    // tempDiv.innerHTML = extractedText;
+    // nextMode.appendChild(tempDiv)
+    // console.log("tempDiv: ", tempDiv)
 
-  // selectionArea
-  // const selection = document.getSelection();
-  // const _startSpan = document.querySelector("#start_span");
-  // const _endSpan = document.querySelector("#end_span");
-  // const spanRange = document.createRange();
-  // console.log(_startSpan,_endSpan)
-  // spanRange.setStartAfter(_startSpan);
-  // spanRange.setEndBefore(_endSpan);
+    // // Range 객체 생성하여 추출된 텍스트에 대한 선택 영역 설정
+    // const selection = window.getSelection();
+    // const range = document.createRange();
 
-  // console.log("spanRange: ", spanRange);
+    // // 추출된 텍스트의 첫 번째 자식 노드를 시작점으로 설정
+    // if (tempDiv.firstChild) {
+    //     range.setStart(tempDiv.firstChild, 0);
+    //     range.setEnd(tempDiv.firstChild, extractedText.length); // 텍스트 길이만큼 설정
+    // }
+    // console.log(range)
 
-  // selection.removeAllRanges();
-  // selection.addRange(spanRange);
+    // // 선택 영역 설정
+    // selection.removeAllRanges();
+    // selection.addRange(range);
 
-  // _startSpan.parentNode.removeChild(_startSpan);
-  // _endSpan.parentNode.removeChild(_endSpan);
+    // // 임시 div 요소 삭제
+    // tempDiv.remove();
 
-  // sharedContent = nextMode.innerHTML
+    // selectionArea
+    //   const selection = document.getSelection();
+    //   const _startSpan = document.querySelector("#start_span");
+    //   const _endSpan = document.querySelector("#end_span");
+    //   const spanRange = document.createRange();
+    //   console.log(_startSpan,_endSpan)
+    //   spanRange.setStartAfter(_startSpan);
+    //   spanRange.setEndBefore(_endSpan);
 
-  // if (type === "edit") nextMode.innerHTML = fragment;
-  // else if (type === "html") nextMode.innerText = fragment;
+    //   console.log("spanRange: ", spanRange);
+
+    //   selection.removeAllRanges();
+    //   selection.addRange(spanRange);
+
+    //   _startSpan.parentNode.removeChild(_startSpan);
+    //   _endSpan.parentNode.removeChild(_endSpan);
+
+    //   sharedContent = nextMode.innerHTML
+
+    //   if (type === "edit") nextMode.innerHTML = fragment;
+    //   else if (type === "html") nextMode.innerText = fragment;
+  }
 }

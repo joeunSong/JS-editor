@@ -28,28 +28,29 @@
           <i class="fa-solid fa-arrow-up"></i>
         </button>
       </div>
-      <textarea class="outViewer" id="view" ></textarea>
+      <textarea class="outViewer" id="view"></textarea>
+      <div id="editorContainer1111"></div>
     </div>
     <script type="text/javascript">
       // 사용자가 서식 버튼 설정
       const formatBtn = [
         "bold",
-        "italic",
-        "strikeThrough",
-        "underline",
-        "justifyLeft",
-        "justifyCenter",
-        "justifyRight",
-        "btn_image",
+    //    "italic",
+    //    "strikeThrough",
+    //    "underline",
+    //    "justifyLeft",
+    //    "justifyCenter",
+    //    "justifyRight",
+    //    "btn_image",
       ];
       const headingData = [
         { text: "기본값", value: "p" },
         { text: "Heading 1", value: "h1" },
         { text: "Heading 2", value: "h2" },
         { text: "Heading 3", value: "h3" },
-        { text: "Heading 4", value: "h4" },
-        { text: "Heading 5", value: "h5" },
-        { text: "Heading 6", value: "h6" },
+    //    { text: "Heading 4", value: "h4" },
+    //    { text: "Heading 5", value: "h5" },
+    //    { text: "Heading 6", value: "h6" },
       ];
       const modeData = [
         { name: "edit", checked: true, value: "편집모드" },
@@ -72,6 +73,9 @@
         const view = document.querySelector("#view");
         editor1.setData(view.value);
       });
+
+      const editor2 = new Editor("editor2", '20rem', '150px',  formatBtn, headingData);
+      const editorContainer1111 = editor1.startEditor('#editorContainer1111');
     </script>
   </body>
 </html>

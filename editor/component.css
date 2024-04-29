@@ -80,3 +80,12 @@ img {
   -o-user-drag: none;
   user-drag: none;
 }
+
+.resizeOnOffBtn {
+  padding: 0.5rem 0.4rem;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: #4a6ca2;
+  color: #fff;
+}
