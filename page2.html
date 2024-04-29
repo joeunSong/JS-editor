@@ -33,30 +33,26 @@
     </div>
     <script type="text/javascript">
       // 사용자가 서식 버튼 설정
-      const formatBtn = [
+      const obj = {
+        formatBtn : [
         "bold",
-    //    "italic",
-    //    "strikeThrough",
-    //    "underline",
-    //    "justifyLeft",
-    //    "justifyCenter",
-    //    "justifyRight",
-    //    "btn_image",
-      ];
-      const headingData = [
+        "italic",
+        "strikeThrough",
+        "underline",
+        "btn_image",
+      ],
+      headingData : [
         { text: "기본값", value: "p" },
         { text: "Heading 1", value: "h1" },
         { text: "Heading 2", value: "h2" },
         { text: "Heading 3", value: "h3" },
-    //    { text: "Heading 4", value: "h4" },
-    //    { text: "Heading 5", value: "h5" },
-    //    { text: "Heading 6", value: "h6" },
-      ];
-      const modeData = [
-        { name: "edit", checked: true, value: "편집모드" },
-        { name: "html", checked: false, value: "HTML모드" },
-        { name: "preview", checked: false, value: "미리보기" },
-      ];
+      ],
+      modeData : [
+      ],
+      customWidth: '20rem',
+      customHeight: '20rem',
+      }
+      
       const editor1 = new Editor("editor1");
       const editorElement = editor1.startEditor('#editorContainer');
 
@@ -74,8 +70,8 @@
         editor1.setData(view.value);
       });
 
-      const editor2 = new Editor("editor2", '20rem', '150px',  formatBtn, headingData);
-      const editorContainer1111 = editor1.startEditor('#editorContainer1111');
+      const editor2 = new Editor("editor2", obj);
+      const editorContainer1111 = editor2.startEditor('#editorContainer1111');
     </script>
   </body>
 </html>

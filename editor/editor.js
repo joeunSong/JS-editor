@@ -1,13 +1,10 @@
 function Editor(
   id,
-  customWidth,
-  customHeight,
-  headingData,
-  modeData,
-  formatBtn
+  obj
 ) {
   this.id = id;
-  this.formatBtn = formatBtn || [
+  console.log(obj)
+  this.formatBtn = (obj && obj.formatBtn) || [
     "bold",
     "italic",
     "strikeThrough",
@@ -17,7 +14,7 @@ function Editor(
     "justifyRight",
     "btn_image",
   ];
-  this.headingData = headingData || [
+  this.headingData = (obj && obj.headingData) || [
     { text: "기본값", value: "p" },
     { text: "Heading 1", value: "h1" },
     { text: "Heading 2", value: "h2" },
@@ -26,13 +23,13 @@ function Editor(
     { text: "Heading 5", value: "h5" },
     { text: "Heading 6", value: "h6" },
   ];
-  this.modeData = modeData || [
+  this.modeData = (obj && obj.modeData) || [
     { name: "edit", checked: true, value: "편집모드" },
     { name: "html", checked: false, value: "HTML모드" },
     { name: "preview", checked: false, value: "미리보기" },
   ];
-  this.customWidth = customWidth || "100%";
-  this.customHeight = customHeight || "20rem";
+  this.customWidth = (obj && obj.customWidth) || "100%";
+  this.customHeight = (obj && obj.customHeight) || "20rem";
 }
 
 let savedSelection;
@@ -49,21 +46,6 @@ const buttonIcon = {
   btn_image: "fa-regular fa-image",
 };
 
-// // 사용자가 modeData 정하는 함수
-// Editor.prototype.setModeData = function (modeData) {
-//   this.modeData = modeData;
-// };
-
-// // 사용자가 headingData를 정하는 함수
-// Editor.prototype.setHeadingData = function (headingData) {
-//   this.headingData = headingData;
-// };
-
-// // 사용자가 formatBtn를 정하는 함수
-// Editor.prototype.setFormatBtn = function (formatBtn) {
-//   this.formatBtn = formatBtn;
-// };
-
 // 에디터의 내용을 받아오는 함수
 Editor.prototype.getData = function () {
   const editMode = document.querySelector(`#${this.id}_editMode`);
@@ -75,6 +57,7 @@ Editor.prototype.setData = function (text) {
   const editMode = document.querySelector(`#${this.id}_editMode`);
   sharedContent = text;
   editMode.innerHTML = sharedContent;
+  editMode.focus();
 };
 
 // 사용자에게 에디터를 시작을 알려주는 함수
